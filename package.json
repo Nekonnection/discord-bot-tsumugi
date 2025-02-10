@@ -1,0 +1,30 @@
+{
+  "name": "discord-bot-template",
+  "version": "1.0.0",
+  "description": "TypeScript templates for development in Discord.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "compile": "tsc -p .",
+    "lint:prettier": "prettier --check src",
+    "fix:prettier": "prettier --write src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "log4js": "^6.9.1",
+    "toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "eslint": "^9.4.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

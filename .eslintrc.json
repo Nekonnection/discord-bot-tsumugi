@@ -1,0 +1,55 @@
+{
+    "env": {
+        "browser": true,
+        "node"   : true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/strict-type-checked",
+        "prettier",
+        "prettier/@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "prettier-plugin-organize-imports"
+    ],
+    "rules": {
+        "@typescript-eslint/explicit-module-boundary-types": "error",
+        "@typescript-eslint/prefer-enum-initializers": "error",
+        "@typescript-eslint/switch-exhaustiveness-check": "error",
+        "@typescript-eslint/strict-boolean-expressions": [
+            "warn",
+            { "allowString": false, "allowNumber": false, "allowNullableObject": false }
+        ],
+        "no-implicit-coercion": "error",
+        "@typescript-eslint/restrict-plus-operands": [
+            "error",
+            {
+                "checkCompoundAssignments": true,
+                "allowBoolean": false,
+                "allowNullish": false,
+                "allowNumberAndString": false,
+                "allowRegExp": false,
+                "allowAny": false
+            }
+        ],
+        "prefer-template": "error",
+        "no-restricted-globals": [
+            "eval",
+            "Boolean",
+            "Function",
+            "globalThis",
+            { "name": "isFinite", "message": "Use Number.isFinite instead." },
+            { "name": "isNaN", "message": "Use Number.isNaN instead." }
+        ],
+        "import/no-cycle": "error"
+    }
+}
