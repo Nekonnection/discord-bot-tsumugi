@@ -5,7 +5,7 @@ import {
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
-    SlashCommandSubcommandsOnlyBuilder,
+    SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 import { InteractionBase } from './interaction_base';
 
