@@ -14,7 +14,7 @@ import HelpOperationMenuAction from './HelpOperationMenuAction';
 /**
  * Helpコマンド
  */
-class HelpCommands extends CommandInteraction {
+class HelpCommand extends CommandInteraction {
     category = '一般';
     command = new SlashCommandBuilder().setName('help').setDescription('Botのヘルプを表示します');
 
@@ -113,4 +113,4 @@ class HelpCommands extends CommandInteraction {
     }
 }
 
-export default new HelpCommands();
+export default new HelpCommand();

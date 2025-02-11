@@ -4,7 +4,7 @@ import { config } from '../../../utils/config';
 /**
  * Pingコマンド
  */
-class PingCommands extends CommandInteraction {
+class PingCommand extends CommandInteraction {
     category = '一般';
     command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
 
@@ -60,4 +60,4 @@ class PingCommands extends CommandInteraction {
     }
 }
 
-export default new PingCommands();
+export default new PingCommand();

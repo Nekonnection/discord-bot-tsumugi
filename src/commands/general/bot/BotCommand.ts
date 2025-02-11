@@ -1,4 +1,15 @@
-import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, Guild, Message, SlashCommandBuilder, time, TimestampStyles, ActionRowBuilder } from 'discord.js';
+import {
+    ButtonBuilder,
+    ButtonStyle,
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    Guild,
+    Message,
+    SlashCommandBuilder,
+    time,
+    TimestampStyles,
+    ActionRowBuilder
+} from 'discord.js';
 import { CommandInteraction } from '../../base/command_base';
 import { config } from '../../../utils/config';
 import { client } from '../../..';
@@ -8,7 +19,7 @@ import { totalGuilds, totalUsers } from '../../../events/ready';
 /**
  * Botコマンド
  */
-class BotCommands extends CommandInteraction {
+class BotCommand extends CommandInteraction {
     category = '一般';
     command = new SlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します');
 
@@ -64,16 +75,10 @@ class BotCommands extends CommandInteraction {
     }
     private async createButtons(): Promise<ButtonBuilder[]> {
         return [
-            new ButtonBuilder()
-                .setLabel("Botを導入")
-                .setStyle(ButtonStyle.Link)
-                .setURL(config.inviteURL),
-            new ButtonBuilder()
-                .setLabel("サポートサーバーに参加")
-                .setStyle(ButtonStyle.Link)
-                .setURL(config.supportGuildURL)
-        ]
+            new ButtonBuilder().setLabel('Botを導入').setStyle(ButtonStyle.Link).setURL(config.inviteURL),
+            new ButtonBuilder().setLabel('サポートサーバーに参加').setStyle(ButtonStyle.Link).setURL(config.supportGuildURL)
+        ];
     }
 }
 
-export default new BotCommands();
+export default new BotCommand();
