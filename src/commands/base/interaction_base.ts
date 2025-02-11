@@ -1,5 +1,11 @@
-import { ApplicationCommandDataResolvable, Interaction } from 'discord.js';
-
+import {
+    ApplicationCommandDataResolvable,
+    Interaction,
+    SlashCommandBuilder,
+    SlashCommandSubcommandsOnlyBuilder,
+    SlashCommandSubcommandBuilder,
+    SlashCommandSubcommandGroupBuilder
+} from 'discord.js';
 /**
  * コマンド/ボタン/コンテキストメニューなどの操作の基底クラス
  */
@@ -24,4 +30,6 @@ export abstract class InteractionBase {
      * @param _interaction InteractionCreateイベントが発生したときのInteraction
      */
     async onInteractionCreate(_interaction: Interaction): Promise<void> {}
+
+    command?: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandSubcommandBuilder | SlashCommandSubcommandGroupBuilder;
 }

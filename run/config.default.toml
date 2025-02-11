@@ -4,3 +4,7 @@ clientId = ""
 guildId = ""
 # BOTのカラーコード
 botColor = ""
+# BOTのアイコンURL
+iconURL = ""
+# BOTの招待リンク
+inviteURL = ""

@@ -8,7 +8,6 @@ import {
     SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 import { InteractionBase } from './interaction_base';
-
 /**
  * コマンドベースのインタラクション
  */
@@ -68,6 +67,7 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
  */
 export abstract class CommandInteraction extends InteractionBase implements CommandBasedInteraction {
     abstract command: SlashCommandBuilder;
+    abstract category: string;
 
     /** @inheritdoc */
     override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
