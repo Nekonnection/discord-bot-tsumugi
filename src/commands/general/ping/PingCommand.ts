@@ -5,6 +5,7 @@ import { config } from '../../../utils/config';
  * Pingコマンド
  */
 class PingCommands extends CommandInteraction {
+    category = '一般';
     command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {

@@ -11,6 +11,9 @@ export interface Config {
     clientId: string;
     guildId: string;
     botColor: string;
+    iconURL: string;
+    inviteURL: string;
+    supportGuildURL: string;
 }
 
 // config.tomlが存在しない場合は、config.default.tomlをコピーする。

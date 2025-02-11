@@ -12,7 +12,7 @@ export default class CommandHandler {
      * コマンドハンドラーを初期化します
      * @param _commands コマンドリスト
      */
-    constructor(private _commands: InteractionBase[]) {}
+    constructor(public _commands: InteractionBase[]) {}
 
     /**
      * コマンドを登録します
