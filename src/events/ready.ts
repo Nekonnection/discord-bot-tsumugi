@@ -16,12 +16,12 @@ class ReadyEvent extends EventBase<'ready'> {
         } catch (error) {
             logger.error('onReady中にエラーが発生しました。', error);
         }
-    }
+    };
 
     private setActivityInterval() {
         setInterval(() => {
             client.user?.setActivity({
-                name: `${client.ws.ping}ms`,
+                name: `${client.ws.ping}ms`
             });
         }, 10000);
     }
