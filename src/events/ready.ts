@@ -2,6 +2,8 @@ import { logger } from '../utils/log';
 import { EventBase } from './base/event_base';
 import { client, commandHandler } from '..';
 
+export let totalGuilds = '情報取得中...';
+export let totalUsers = '情報取得中...';
 /**
  * クライアントが準備完了したときに実行されるイベント
  */
@@ -18,12 +20,31 @@ class ReadyEvent extends EventBase<'ready'> {
         }
     };
 
-    private setActivityInterval() {
-        setInterval(() => {
+    private async setActivityInterval() {
+        setInterval(async () => {
             client.user?.setActivity({
-                name: `${client.ws.ping}ms`
+                name: `/help | Servers: ${totalGuilds} | Users: ${totalUsers} | ${client.ws.ping}ms`
             });
         }, 10000);
+
+        setInterval(async () => {
+            totalGuilds = await this.checkTotalGuilds();
+            totalUsers = await this.checkTotalUsers();
+            totalUsers;
+        }, 60000);
+    }
+
+    public async checkTotalGuilds(): Promise<string> {
+        return client.guilds.cache.size.toString();
+    }
+    public async checkTotalUsers(): Promise<string> {
+        let totalMembers = 0;
+
+        for (const guild of client.guilds.cache.values()) {
+            await guild.members.fetch();
+            totalMembers += guild.memberCount;
+        }
+        return totalMembers.toString();
     }
 }
 
