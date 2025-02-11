@@ -9,15 +9,15 @@ class PingCommands extends CommandInteraction {
     command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        const pingEmbed = this.createEmbed(interaction, 'Pingを測定中...', false);
+        await interaction.deferReply();
+        const pingEmbed = await this.createEmbed(interaction, 'Pingを測定中...', false);
 
-        await interaction.reply({
-            embeds: [pingEmbed],
-            allowedMentions: { repliedUser: false }
+        await interaction.editReply({
+            embeds: [pingEmbed]
         });
 
         const message: Message<boolean> = await interaction.fetchReply();
-        const updatedPingEmbed = this.createEmbed(interaction, 'Pingを測定しました', true, message);
+        const updatedPingEmbed = await this.createEmbed(interaction, 'Pingを測定しました', true, message);
 
         await interaction.editReply({
             embeds: [updatedPingEmbed]
@@ -31,7 +31,12 @@ class PingCommands extends CommandInteraction {
      * @param message メッセージ
      * @returns 埋め込みメッセージ
      */
-    private createEmbed(interaction: ChatInputCommandInteraction, title: string, isUpdate: boolean, message?: Message<boolean>): EmbedBuilder {
+    private async createEmbed(
+        interaction: ChatInputCommandInteraction,
+        title: string,
+        isUpdate: boolean,
+        message?: Message<boolean>
+    ): Promise<EmbedBuilder> {
         const embed = new EmbedBuilder()
             .setTitle(title)
             .setColor(Number(config.botColor))

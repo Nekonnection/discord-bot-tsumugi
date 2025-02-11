@@ -1,6 +1,6 @@
 {
-  "name": "discord-bot-template",
-  "version": "1.0.0",
+  "name": "discord-bot-tsumugi",
+  "version": "3.0.0",
   "description": "TypeScript templates for development in Discord.js",
   "main": "dist/index.js",
   "scripts": {

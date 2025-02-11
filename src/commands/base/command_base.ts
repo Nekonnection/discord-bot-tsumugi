@@ -5,7 +5,8 @@ import {
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
-    SlashCommandSubcommandsOnlyBuilder
+    SlashCommandSubcommandsOnlyBuilder,
+    StringSelectMenuInteraction
 } from 'discord.js';
 import { InteractionBase } from './interaction_base';
 /**
