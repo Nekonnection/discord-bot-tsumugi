@@ -83,7 +83,7 @@ class HelpOperationMenuAction extends MessageComponentActionInteraction<Componen
             })
             .setColor(Number(config.botColor))
             .setTimestamp()
-            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.avatarURL() || undefined });
+            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
     }
 }
 

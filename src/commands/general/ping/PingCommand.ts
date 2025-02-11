@@ -41,7 +41,7 @@ class PingCommand extends CommandInteraction {
             .setTitle(title)
             .setColor(Number(config.botColor))
             .setTimestamp()
-            .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.avatarURL() || undefined });
+            .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.displayAvatarURL() || undefined });
 
         if (isUpdate && message) {
             embed.setFields(

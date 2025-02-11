@@ -54,7 +54,7 @@ class HelpCommand extends CommandInteraction {
             })
             .setColor(Number(config.botColor))
             .setTimestamp()
-            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.avatarURL() || undefined });
+            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
     }
     /**
      * カテゴリーごとの埋め込みメッセージを作成する関数
@@ -79,7 +79,7 @@ class HelpCommand extends CommandInteraction {
                     }))
                 )
                 .setTimestamp()
-                .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.avatarURL() || undefined });
+                .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
         });
     }
     /**
