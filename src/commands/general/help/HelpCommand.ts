@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, ActionRowBuilder } from 'discord.js';
 import { CommandInteraction } from '../../base/command_base';
 import { config } from '../../../utils/config';
 import { commandHandler } from '../../..';
@@ -12,7 +12,13 @@ class HelpCommands extends CommandInteraction {
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         const embeds = this.createEmbeds(interaction);
-        await interaction.reply({ embeds: [embeds[0]] });
+        const selectMenu = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+            this.createSelectMenu()
+        );
+        await interaction.reply({ 
+            embeds: [embeds[0]],
+            components: [selectMenu]
+        });
     }
     /**
      * 埋め込みメッセージを作成する関数
@@ -62,13 +68,33 @@ class HelpCommands extends CommandInteraction {
     ): EmbedBuilder[] {
         return commandsCategoryList.map((category) => {
             return new EmbedBuilder()
-                .setAuthor({ name: '猫咲 紬 - ヘルプ', iconURL: config.iconURL })
+                .setAuthor({ name: "猫咲 紬 - ヘルプ", iconURL: config.iconURL })
                 .setTitle(`${category.category}`)
                 .setColor(Number(config.botColor))
                 .setDescription(category.commands.map((command) => `**/${command.name}**: ${command.description}`).join('\n'))
                 .setTimestamp()
                 .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.avatarURL() || undefined });
         });
+    }
+    /**
+     * カテゴリーごとのページ選択メニューを作成する関数
+     * @returns ページ選択メニュー
+     */
+    private createSelectMenu(): StringSelectMenuBuilder {
+        const commandsCategoryList = this.commandsCategoryList();
+        const categoryPages = commandsCategoryList.map((category, index) => `${index + 1}ページ目: ${category.category}`).join('\n');
+        const categoryOptions = commandsCategoryList.map((category) => ({
+            label: categoryPages,
+            description: `${category.category}に関するコマンド一覧`,
+            value: category.category
+        }));
+
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId("help_category_select")
+            .setPlaceholder("ページを選択してください")
+            .addOptions(categoryOptions);
+
+        return selectMenu;
     }
     /**
      * コマンドをカテゴリーごとに分類する関数
@@ -79,13 +105,13 @@ class HelpCommands extends CommandInteraction {
 
         // コマンドをカテゴリーごとに分類
         commandHandler._commands.forEach((command) => {
-            const category = (command as CommandInteraction).category || 'その他';
+            const category = (command as CommandInteraction).category || "その他";
             if (!commandsCategory[category]) {
                 commandsCategory[category] = [];
             }
             commandsCategory[category].push({
-                name: command.command?.name ?? 'コマンド名が見つかりませんでした',
-                description: command.command?.description ?? 'コマンド説明が見つかりませんでした'
+                name: command.command?.name ?? "コマンド名が見つかりませんでした",
+                description: command.command?.description ?? "コマンド説明が見つかりませんでした"
             });
         });
 
