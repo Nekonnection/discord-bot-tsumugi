@@ -12,7 +12,7 @@ class HelpCategoryMenuAction extends MessageComponentActionInteraction<Component
         const commandsCategoryList = await helpCommand.commandsCategoryList();
         const categoryOptions = commandsCategoryList.map((category, index) => ({
             label: `${index + 1}ページ目: ${category.category}`,
-            description: `${category.category}コマンド一覧`,
+            description: `カテゴリー: ${category.category}コマンド に移動します`,
             value: category.category
         }));
         return new StringSelectMenuBuilder().setCustomId(customId).setPlaceholder('ページを選択してください').addOptions(categoryOptions);

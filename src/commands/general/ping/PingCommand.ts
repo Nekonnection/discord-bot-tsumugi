@@ -24,7 +24,7 @@ class PingCommand extends CommandInteraction {
         });
     }
     /**
-     * 埋め込みメッセージを作成します
+     * 埋め込みメッセージを作成する関数
      * @param interaction インタラクション
      * @param title タイトル
      * @param isUpdate アップデートかどうか

@@ -32,6 +32,11 @@ class BotCommand extends CommandInteraction {
             components: [buttons]
         });
     }
+    /**
+     * 埋め込みメッセージを作る関数
+     * @param interaction インタラクション
+     * @returns 埋め込みメッセージ
+     */
     private async createEmbed(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         const botCreatedAt = client.user?.createdAt || new Date();
         const packageJsonPath = path.join(__dirname, '../../../../package.json');
@@ -42,7 +47,7 @@ class BotCommand extends CommandInteraction {
             .setColor(Number(config.botColor))
             .addFields({
                 name: '名前',
-                value: '猫咲 紬 (Tsumugi byousaki)',
+                value: '猫咲 紬 (Tsumugi Byousaki)',
                 inline: false
             })
             .addFields({
@@ -73,6 +78,10 @@ class BotCommand extends CommandInteraction {
             .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.avatarURL() || undefined })
             .setThumbnail(config.iconURL);
     }
+    /**
+     * ボタンを作る関数
+     * @returns ボタン
+     */
     private async createButtons(): Promise<ButtonBuilder[]> {
         return [
             new ButtonBuilder().setLabel('Botを導入').setStyle(ButtonStyle.Link).setURL(config.inviteURL),

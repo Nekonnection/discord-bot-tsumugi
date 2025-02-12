@@ -20,6 +20,11 @@ class OmikujiCommand extends CommandInteraction {
             embeds: [embed]
         });
     }
+    /**
+     * 埋め込みメッセージを作成する関数
+     * @param interaction インタラクション
+     * @returns 埋め込みメッセージ
+     */
     private async createEmbed(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         const omikuji = await this.createOmikuji()
         return new EmbedBuilder()

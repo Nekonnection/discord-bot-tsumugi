@@ -42,7 +42,7 @@ class HelpOperationMenuAction extends MessageComponentActionInteraction<Componen
      * @param interaction インタラクション
      */
     async onCommand(interaction: StringSelectMenuInteraction): Promise<void> {
-        await interaction.deferUpdate(); // インタラクションを即座に遅延させます
+        await interaction.deferUpdate();
 
         const commandsCategoryList = helpCommand.commandsCategoryList();
         switch (interaction.values[0]) {
