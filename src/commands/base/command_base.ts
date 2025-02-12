@@ -6,7 +6,7 @@ import {
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
     SlashCommandSubcommandsOnlyBuilder,
-    StringSelectMenuInteraction
+    PermissionResolvable
 } from 'discord.js';
 import { InteractionBase } from './interaction_base';
 /**
@@ -69,6 +69,7 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
 export abstract class CommandInteraction extends InteractionBase implements CommandBasedInteraction {
     abstract command: SlashCommandBuilder;
     abstract category: string;
+    abstract permission: bigint[] | null;
 
     /** @inheritdoc */
     override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
@@ -84,6 +85,10 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) return;
         if (!this.isMyInteraction(interaction)) return;
+        if (this.permission && !interaction.memberPermissions?.has(this.permission)) {
+            await interaction.reply('このコマンドを実行する権限がありません。');
+            return;
+        }
         await this.onCommand(interaction);
     }
 

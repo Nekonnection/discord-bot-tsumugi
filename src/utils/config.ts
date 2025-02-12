@@ -13,6 +13,8 @@ export interface Config {
     botColor: string;
     iconURL: string;
     inviteURL: string;
+    announcementGuildId: string;
+    announcementChannelId: string;
     supportGuildURL: string;
 }
 

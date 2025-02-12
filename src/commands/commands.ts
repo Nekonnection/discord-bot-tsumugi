@@ -5,8 +5,9 @@ import helpSelectMenuAction from './general/help/HelpCategoryMenuAction.js';
 import helpOperationMenuAction from './general/help/HelpOperationMenuAction.js';
 import botCommand from './general/bot/BotCommand.js';
 import shitCommand from '../commands/unti/shit.js';
-import OmikujiCommand from './fun/omikuji/OmikujiCommand.js';
+import omikujiCommand from './fun/omikuji/OmikujiCommand.js';
+import followCommand from '../commands/general/follow/FollowCommand.js'
 
-const commands: InteractionBase[] = [pingCommand, helpCommand, helpSelectMenuAction, helpOperationMenuAction, botCommand, OmikujiCommand, shitCommand];
+const commands: InteractionBase[] = [pingCommand, helpCommand, helpSelectMenuAction, helpOperationMenuAction, botCommand, omikujiCommand, shitCommand, followCommand];
 
 export default commands;

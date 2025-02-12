@@ -16,6 +16,7 @@ import HelpOperationMenuAction from './HelpOperationMenuAction';
  */
 class HelpCommand extends CommandInteraction {
     category = '一般';
+    permission = null;
     command = new SlashCommandBuilder().setName('help').setDescription('Botのヘルプを表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {

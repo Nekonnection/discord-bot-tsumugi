@@ -5,6 +5,7 @@ import { CommandInteraction } from '../base/command_base';
  */
 class ShitCommands extends CommandInteraction {
     category = 'うんち';
+    permission = null;
     command = new SlashCommandBuilder().setName('shit').setDescription('💩を表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {

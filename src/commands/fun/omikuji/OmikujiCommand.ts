@@ -11,8 +11,8 @@ import { config } from '../../../utils/config';
  */
 class OmikujiCommand extends CommandInteraction {
     category = 'お遊び系';
+    permission = null;
     command = new SlashCommandBuilder().setName('omikuji').setDescription('おみくじが引けます');
-
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
         const embed = await this.createEmbed(interaction);
