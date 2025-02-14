@@ -5,9 +5,9 @@ import { config } from '../../../utils/config';
  * Pingコマンド
  */
 class PingCommand extends CommandInteraction {
-    category = '一般';
-    permission = null;
-    command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
+    readonly category = '一般';
+    readonly permission = null;
+    readonly command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
@@ -41,7 +41,6 @@ class PingCommand extends CommandInteraction {
         const embed = new EmbedBuilder()
             .setTitle(title)
             .setColor(Number(config.botColor))
-            .setTimestamp()
             .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.displayAvatarURL() || undefined });
 
         if (isUpdate && message) {

@@ -15,7 +15,7 @@ class HelpCategoryMenuAction extends MessageComponentActionInteraction<Component
             description: `カテゴリー: ${category.category}コマンド に移動します`,
             value: category.category
         }));
-        return new StringSelectMenuBuilder().setCustomId(customId).setPlaceholder('ページを選択してください').addOptions(categoryOptions);
+        return new StringSelectMenuBuilder().setCustomId(customId).setPlaceholder('ページを選択').addOptions(categoryOptions);
     }
 
     /**
@@ -28,7 +28,6 @@ class HelpCategoryMenuAction extends MessageComponentActionInteraction<Component
         const categoryIndex = (await commandsCategoryList).findIndex((cat) => cat.category === category);
         const categoryEmbeds = await helpCommand.createCategoryEmbeds(interaction, await commandsCategoryList);
         const categoryEmbed = categoryEmbeds[categoryIndex];
-
         await interaction.update({
             embeds: [categoryEmbed]
         });

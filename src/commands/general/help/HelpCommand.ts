@@ -15,10 +15,10 @@ import HelpOperationMenuAction from './HelpOperationMenuAction';
  * Helpコマンド
  */
 class HelpCommand extends CommandInteraction {
-    category = '一般';
-    permission = null;
-    command = new SlashCommandBuilder().setName('help').setDescription('Botのヘルプを表示します');
-
+    readonly category = '一般';
+    readonly permission = null;
+    readonly command = new SlashCommandBuilder().setName('help').setDescription('Botのヘルプを表示します');
+    
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
         const embeds = await this.createHomeEmbed(interaction, await this.commandsCategoryList());
@@ -27,7 +27,7 @@ class HelpCommand extends CommandInteraction {
         const selectMenu = [
             new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(categoryMenu),
             new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(operationMenu)
-        ];
+        ]
         await interaction.editReply({
             embeds: [embeds],
             components: [...selectMenu]
@@ -54,7 +54,6 @@ class HelpCommand extends CommandInteraction {
                 value: `[Botを招待する](${config.inviteURL})/[サポートサーバーに入る](${config.supportGuildURL})`
             })
             .setColor(Number(config.botColor))
-            .setTimestamp()
             .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
     }
     /**
@@ -68,18 +67,15 @@ class HelpCommand extends CommandInteraction {
         commandsCategoryList: { category: string; commands: { name: string; description: string }[] }[]
     ): Promise<EmbedBuilder[]> {
         return commandsCategoryList.map((category) => {
+            const commandList = category.commands.map((command) => ({
+                name: `/${command.name}`,
+                value: command.description,
+                inline: false
+            }));
             return new EmbedBuilder()
                 .setAuthor({ name: '猫咲 紬 - ヘルプ', iconURL: config.iconURL })
-                .setDescription(`${category.category}コマンド一覧`)
                 .setColor(Number(config.botColor))
-                .addFields(
-                    category.commands.map((command) => ({
-                        name: `/${command.name}`,
-                        value: command.description,
-                        inline: false
-                    }))
-                )
-                .setTimestamp()
+                .addFields(commandList)
                 .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
         });
     }

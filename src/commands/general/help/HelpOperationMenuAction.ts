@@ -66,13 +66,13 @@ class HelpOperationMenuAction extends MessageComponentActionInteraction<Componen
                     embeds: [guideEmbed]
                 });
                 break;
-            default:
-                await interaction.followUp({
-                    content: '存在しないオプションが選択されました。'
-                });
-                break;
         }
     }
+    /**
+     * 使い方の埋め込みメッセージを作成する関数
+     * @param interaction インタラクション
+     * @returns 使い方の埋め込みメッセージ
+     */
     private async createGuideEmbed(interaction: StringSelectMenuInteraction): Promise<EmbedBuilder> {
         return new EmbedBuilder()
             .setAuthor({ name: '猫咲 紬 - ヘルプ', iconURL: config.iconURL })

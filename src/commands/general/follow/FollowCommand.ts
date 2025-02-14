@@ -5,9 +5,9 @@ import { config } from '../../../utils/config';
  * followコマンド
  */
 class FollowCommand extends CommandInteraction {    
-    category = '一般';
-    permission = [PermissionsBitField.Flags.ManageChannels];
-    command = new SlashCommandBuilder().setName('follow').setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。');
+    readonly category = '一般';
+    readonly permission = [PermissionsBitField.Flags.ManageChannels];
+    readonly command = new SlashCommandBuilder().setName('follow').setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply({

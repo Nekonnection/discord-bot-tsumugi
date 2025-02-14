@@ -18,9 +18,9 @@ import { totalGuilds, totalUsers } from '../../../events/ready';
  * Botコマンド
  */
 class BotCommand extends CommandInteraction {
-    category = '一般';
-    permission = null;
-    command = new SlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します');
+    readonly category = '一般';
+    readonly permission = null;
+    readonly command = new SlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
