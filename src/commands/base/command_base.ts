@@ -3,6 +3,9 @@ import {
     AutocompleteInteraction,
     ChatInputCommandInteraction,
     Interaction,
+    MessageFlags,
+    PermissionResolvable,
+    PermissionsBitField,
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
@@ -79,9 +82,13 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     }
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: Interaction): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
-        if (!this.isMyInteraction(interaction)) return;
+    override async onInteractionCreate(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (!interaction.isChatInputCommand() || !this.isMyInteraction(interaction)) return;
+
+        const permissionChecker = new PermissionChecker(this.command);
+
+        if (!(await permissionChecker.checkPermissions(interaction))) return;
+
         await this.onCommand(interaction);
     }
 
@@ -147,8 +154,10 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
 
     /** @inheritdoc */
     override async onInteractionCreate(interaction: Interaction): Promise<void> {
-        if (interaction.isChatInputCommand()) {
-            if (!this.isMyInteraction(interaction)) return;
+        if (interaction.isChatInputCommand() && this.isMyInteraction(interaction)) {
+            const permissionChecker = new PermissionChecker(this.command as CustomSlashCommandBuilder);
+
+            if (!(await permissionChecker.checkPermissions(interaction))) return;
             await this.onCommand(interaction);
         } else if (interaction.isAutocomplete()) {
             await this.onAutocomplete(interaction);
@@ -165,4 +174,43 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
      * @param interaction インタラクション
      */
     abstract onAutocomplete(interaction: AutocompleteInteraction): Promise<void>;
+}
+/**
+ * 権限を確認するクラス
+ */
+class PermissionChecker {
+    private command: CustomSlashCommandBuilder;
+
+    constructor(command: CustomSlashCommandBuilder) {
+        this.command = command;
+    }
+
+    async checkPermissions(interaction: ChatInputCommandInteraction): Promise<boolean> {
+        const botPermissions = interaction.guild?.members.me?.permissions;
+        const memberPermissions = interaction.member?.permissions;
+
+        if (this.command.default_bot_permissions && !botPermissions?.has(this.command.default_bot_permissions as PermissionResolvable)) {
+            await interaction.reply({
+                content: 'Botに必要な権限がありません',
+                flags: MessageFlags.Ephemeral
+            });
+            return false;
+        }
+
+        if (
+            this.command.default_member_permissions &&
+            !(
+                memberPermissions instanceof PermissionsBitField &&
+                memberPermissions.has(this.command.default_member_permissions as PermissionResolvable)
+            )
+        ) {
+            await interaction.reply({
+                content: 'あなたに必要な権限がありません',
+                flags: MessageFlags.Ephemeral
+            });
+            return false;
+        }
+
+        return true;
+    }
 }
