@@ -1,26 +1,16 @@
-import {
-    ButtonBuilder,
-    ButtonStyle,
-    ChatInputCommandInteraction,
-    EmbedBuilder,
-    SlashCommandBuilder,
-    time,
-    TimestampStyles,
-    ActionRowBuilder
-} from 'discord.js';
+import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, time, TimestampStyles, ActionRowBuilder } from 'discord.js';
 import { CommandInteraction } from '../../base/command_base';
 import { config } from '../../../utils/config';
 import { client } from '../../..';
 import path from 'path';
 import { promises as fs } from 'fs';
 import { totalGuilds, totalUsers } from '../../../events/ready';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
 /**
  * Botコマンド
  */
 class BotCommand extends CommandInteraction {
-    readonly category = '一般';
-    readonly permission = null;
-    readonly command = new SlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します');
+    readonly command = new CustomSlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します').setCategory('一般').setUsage('`/bot`');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();

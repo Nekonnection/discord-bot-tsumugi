@@ -1,4 +1,4 @@
-import { Interaction, MappedComponentBuilderTypes, MappedInteractionTypes, ModalBuilder, ModalSubmitInteraction } from 'discord.js';
+import { Interaction, MappedComponentTypes, MappedInteractionTypes, ModalBuilder, ModalSubmitInteraction } from 'discord.js';
 import { InteractionBase } from './interaction_base.js';
 
 /**
@@ -86,7 +86,7 @@ export abstract class MessageComponentActionInteraction<MenuComponentType extend
      * ビルダーの作成を行う
      * @returns 作成したビルダー
      */
-    abstract create(...args: unknown[]): Promise<MappedComponentBuilderTypes[MenuComponentType]>;
+    abstract create(...args: unknown[]): Promise<MappedComponentTypes[MenuComponentType]>;
 
     /** @inheritdoc */
     protected override createCustomId(data?: Record<string, string>): string {

@@ -1,14 +1,15 @@
 import {
     ApplicationCommandDataResolvable,
+    AutocompleteInteraction,
     ChatInputCommandInteraction,
     Interaction,
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
-    SlashCommandSubcommandsOnlyBuilder,
-    PermissionResolvable
+    SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 import { InteractionBase } from './interaction_base';
+import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder';
 /**
  * コマンドベースのインタラクション
  */
@@ -37,7 +38,6 @@ export abstract class CommandGroupInteraction extends InteractionBase implements
         return interaction.commandName === this.command.name;
     }
 }
-
 /**
  * サブコマンドグループ
  */
@@ -62,14 +62,11 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
         return interaction.options.getSubcommandGroup() === this.command.name && this._registry.isMyInteraction(interaction);
     }
 }
-
 /**
  * コマンド
  */
 export abstract class CommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: SlashCommandBuilder;
-    abstract category: string;
-    abstract permission: bigint[] | null;
+    abstract command: CustomSlashCommandBuilder;
 
     /** @inheritdoc */
     override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
@@ -85,10 +82,6 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) return;
         if (!this.isMyInteraction(interaction)) return;
-        if (this.permission && !interaction.memberPermissions?.has(this.permission)) {
-            await interaction.reply('このコマンドを実行する権限がありません。');
-            return;
-        }
         await this.onCommand(interaction);
     }
 
@@ -102,7 +95,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
 /**
  * サブコマンド
  */
-export abstract class SubcommandInteraction extends InteractionBase implements CommandBasedInteraction {
+export abstract class SubCommandInteraction extends InteractionBase implements CommandBasedInteraction {
     abstract command: SlashCommandSubcommandBuilder;
 
     /**
@@ -135,4 +128,41 @@ export abstract class SubcommandInteraction extends InteractionBase implements C
      * @param interaction インタラクション
      */
     abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
+}
+/**
+ * オートコンプリート付きコマンド
+ */
+export abstract class AutocompleteCommandInteraction extends InteractionBase implements CommandBasedInteraction {
+    abstract command: SlashCommandBuilder;
+
+    /** @inheritdoc */
+    override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
+        commandList.push(this.command);
+    }
+
+    /** @inheritdoc */
+    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+        return interaction.commandName === this.command.name;
+    }
+
+    /** @inheritdoc */
+    override async onInteractionCreate(interaction: Interaction): Promise<void> {
+        if (interaction.isChatInputCommand()) {
+            if (!this.isMyInteraction(interaction)) return;
+            await this.onCommand(interaction);
+        } else if (interaction.isAutocomplete()) {
+            await this.onAutocomplete(interaction);
+        }
+    }
+
+    /**
+     * コマンドが実行されたときに呼ばれる関数
+     * @param interaction インタラクション
+     */
+    abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
+    /**
+     * オートコンプリートが実行されたときに呼ばれる関数
+     * @param interaction インタラクション
+     */
+    abstract onAutocomplete(interaction: AutocompleteInteraction): Promise<void>;
 }

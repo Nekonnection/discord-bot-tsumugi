@@ -1,13 +1,12 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
 import { CommandInteraction } from '../../base/command_base';
 import { config } from '../../../utils/config';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
 /**
  * Pingコマンド
  */
 class PingCommand extends CommandInteraction {
-    readonly category = '一般';
-    readonly permission = null;
-    readonly command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
+    readonly command = new CustomSlashCommandBuilder().setName('ping').setDescription('Pingを表示します').setCategory('一般').setUsage('`/ping`');
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();

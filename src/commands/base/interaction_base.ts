@@ -6,6 +6,7 @@ import {
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder
 } from 'discord.js';
+import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder';
 /**
  * コマンド/ボタン/コンテキストメニューなどの操作の基底クラス
  */
@@ -31,5 +32,10 @@ export abstract class InteractionBase {
      */
     async onInteractionCreate(_interaction: Interaction): Promise<void> {}
 
-    command?: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandSubcommandBuilder | SlashCommandSubcommandGroupBuilder;
+    command?:
+        | CustomSlashCommandBuilder
+        | SlashCommandBuilder
+        | SlashCommandSubcommandsOnlyBuilder
+        | SlashCommandSubcommandBuilder
+        | SlashCommandSubcommandGroupBuilder;
 }

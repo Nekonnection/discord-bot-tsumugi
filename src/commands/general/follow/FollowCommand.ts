@@ -1,13 +1,18 @@
-import { ChannelType, ChatInputCommandInteraction, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, InteractionContextType } from 'discord.js';
 import { CommandInteraction } from '../../base/command_base';
 import { config } from '../../../utils/config';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
 /**
  * followコマンド
  */
-class FollowCommand extends CommandInteraction {    
-    readonly category = '一般';
-    readonly permission = [PermissionsBitField.Flags.ManageChannels];
-    readonly command = new SlashCommandBuilder().setName('follow').setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。');
+class FollowCommand extends CommandInteraction {
+    readonly command = new CustomSlashCommandBuilder()
+        .setName('follow')
+        .setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。')
+        .setCategory('一般')
+        .setUsage('`/follow`')
+        .setDefaultBotPermissions(PermissionFlagsBits.ManageChannels)
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
     async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply({
@@ -19,11 +24,11 @@ class FollowCommand extends CommandInteraction {
             if (!channelId) return;
             await announcementChannel.addFollower(channelId);
             await interaction.editReply({
-                content: "Botからのお知らせをフォローしました",
+                content: 'Botからのお知らせをフォローしました'
             });
         } else {
             await interaction.editReply({
-                content: "Botからのお知らせチャンネルが見つかりませんでした"
+                content: 'Botからのお知らせチャンネルが見つかりませんでした'
             });
         }
     }
