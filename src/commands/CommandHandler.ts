@@ -20,7 +20,6 @@ export default class CommandHandler {
     async registerCommands(): Promise<void> {
         // サーバーを取得
         const guild = await client.guilds.fetch(config.guildId);
-
         // 登録するコマンドリスト
         const applicationCommands: ApplicationCommandDataResolvable[] = [];
 

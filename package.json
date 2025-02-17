@@ -1,7 +1,7 @@
 {
   "name": "discord-bot-tsumugi",
   "version": "3.0.0",
-  "description": "TypeScript templates for development in Discord.js",
+  "description": "「可愛くて、楽しい」DiscordBot",
   "main": "dist/index.js",
   "scripts": {
     "test": "ts-node src/index.ts",
@@ -11,7 +11,7 @@
     "fix:prettier": "prettier --write src"
   },
   "keywords": [],
-  "author": "",
+  "author": "NekosanQ",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.3.1",
