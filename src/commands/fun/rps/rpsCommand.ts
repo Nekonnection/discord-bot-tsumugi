@@ -26,7 +26,7 @@ const RESULTS = {
     draw: { message: 'あいこです！🤝', color: 0xfee75c }
 } as const;
 
-class JankenCommand extends CommandInteraction {
+class RPCCommand extends CommandInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('rpc')
         .setDescription('Botとじゃんけんをします。')
@@ -73,4 +73,4 @@ class JankenCommand extends CommandInteraction {
     }
 }
 
-export default new JankenCommand();
+export default new RPCCommand();
