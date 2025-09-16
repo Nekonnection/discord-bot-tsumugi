@@ -15,7 +15,7 @@ class InteractionCreateEvent extends EventBase<'interactionCreate'> {
             await commandHandler.onInteractionCreate(interaction);
         } catch (error) {
             logger.error('onInteractionCreate中にエラーが発生しました。', error);
-            return Promise.resolve();
+            return;
         }
     };
 }
