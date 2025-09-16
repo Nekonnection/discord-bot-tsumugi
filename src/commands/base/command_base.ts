@@ -18,7 +18,7 @@ import { InteractionBase } from './interaction_base.js';
  */
 interface CommandBasedInteraction {
     /**
-     * 自分のインタラクションかどうかを判定するための関数
+     * 自分のインタラクションかどうかを判定する
      * @param interaction インタラクション
      * @returns 自分のインタラクションかどうか
      */
@@ -93,7 +93,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     }
 
     /**
-     * コマンドが実行されたときに呼ばれる関数
+     * コマンドが実行されたときに呼ばれる
      * @param interaction インタラクション
      */
     protected abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
@@ -131,7 +131,7 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
     }
 
     /**
-     * コマンドが実行されたときに呼ばれる関数
+     * コマンドが実行されたときに呼ばれる
      * @param interaction インタラクション
      */
     public abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
@@ -165,12 +165,12 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
     }
 
     /**
-     * コマンドが実行されたときに呼ばれる関数
+     * コマンドが実行されたときに呼ばれる
      * @param interaction インタラクション
      */
     protected abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
     /**
-     * オートコンプリートが実行されたときに呼ばれる関数
+     * オートコンプリートが実行されたときに呼ばれる
      * @param interaction インタラクション
      */
     protected abstract onAutocomplete(interaction: AutocompleteInteraction): Promise<void>;
@@ -185,7 +185,7 @@ export class PermissionChecker {
         this.command = command;
     }
     /**
-     * Botとメンバーの権限を確認します。
+     * Botとメンバーの権限を確認する
      * @param interaction インタラクション
      * @returns 権限が満たされている場合はtrue、そうでない場合はfalse
      */

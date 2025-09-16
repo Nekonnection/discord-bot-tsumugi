@@ -57,7 +57,7 @@ abstract class ActionInteraction<MenuInteraction extends Interaction & { customI
     }
 
     /**
-     * コマンドが実行されたときに呼ばれる関数
+     * コマンドが実行されたときに呼ばれる
      * @param interaction インタラクション
      * @param params カスタムIDのパラメータ
      */

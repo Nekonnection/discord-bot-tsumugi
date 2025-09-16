@@ -5,7 +5,9 @@ import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.
 import { CommandInteraction } from '../../base/command_base.js';
 
 const REELS = ['7️⃣', '🍒', '🍋', '🔔', '🍉', '⭐', '💎'];
-
+/**
+ * スロットコマンド
+ */
 class SlotCommand extends CommandInteraction {
     public command = new CustomSlashCommandBuilder().setName('slot').setDescription('スロットを回します').setCategory('お遊び系').setUsage('`/slot`');
 

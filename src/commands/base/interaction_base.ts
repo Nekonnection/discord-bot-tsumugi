@@ -13,7 +13,7 @@ import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js'
  */
 export abstract class InteractionBase {
     /**
-     * ApplicationCommandManagerにコマンドを登録するための関数です
+     * ApplicationCommandManagerにコマンドを登録する
      * commandListにpush_backして登録することで、すべてのコマンドの登録後にまとめてDiscordにコマンドが登録されます
      * @param _commandList ApplicationCommandManagerに登録するコマンドのリスト
      */
@@ -22,7 +22,7 @@ export abstract class InteractionBase {
     }
 
     /**
-     * 他のInteractionBase(コマンドなど)に対してサブコマンドを登録するための関数です
+     * 他のInteractionBase(コマンドなど)に対してサブコマンドを登録する
      * すべてのサブコマンドの登録後、registerCommands()が呼ばれます
      */
     public registerSubCommands(): void {
@@ -30,7 +30,7 @@ export abstract class InteractionBase {
     }
 
     /**
-     * InteractionCreateイベントが発生したときに呼ばれる関数です
+     * InteractionCreateイベントが発生したときに呼ばれる
      * 登録されているすべてのInteractionBaseに対して呼ばれます。
      * if文で必要な処理を行うか判断し、処理を行ってください。
      * @param _interaction InteractionCreateイベントが発生したときのInteraction

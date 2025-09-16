@@ -22,7 +22,7 @@ class OmikujiCommand extends CommandInteraction {
         });
     }
     /**
-     * 埋め込みメッセージを作成する関数
+     * 埋め込みメッセージを作成する
      * @param interaction インタラクション
      * @returns 埋め込みメッセージ
      */
@@ -35,7 +35,7 @@ class OmikujiCommand extends CommandInteraction {
             .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
     }
     /**
-     * おみくじを作成する関数
+     * おみくじを作成する
      * @returns おみくじの結果
      */
     private createOmikuji(): string {
@@ -63,7 +63,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 運勢を選択する関数
+     * 運勢を選択する
      * @returns 運勢
      */
     private selectFortune(): string {
@@ -91,7 +91,7 @@ class OmikujiCommand extends CommandInteraction {
         return selectedFortune ? selectedFortune.fortune : '大吉';
     }
     /**
-     * リストからランダムなアイテムを選択する関数
+     * リストからランダムなアイテムを選択する
      * @param list アイテムのリスト
      * @returns ランダムに選ばれたアイテム
      */
@@ -100,7 +100,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 願望を選択する関数
+     * 願望を選択する
      * @returns 願望
      */
     private selectHope(): string {
@@ -109,7 +109,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 失物を選択する関数
+     * 失物を選択する
      * @returns 失物
      */
     private selectLostItem(): string {
@@ -127,7 +127,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 学問を選択する関数
+     * 学問を選択する
      * @returns 学問
      */
     private selectLearning(): string {
@@ -136,7 +136,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 争事を選択する関数
+     * 争事を選択する
      * @returns 争事
      */
     private selectConflict(): string {
@@ -154,7 +154,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 恋愛を選択する関数
+     * 恋愛を選択する
      * @returns 恋愛
      */
     private selectLove(): string {
@@ -163,7 +163,7 @@ class OmikujiCommand extends CommandInteraction {
     }
 
     /**
-     * 病気を選択する関数
+     * 病気を選択する
      * @returns 病気
      */
     private selectDisease(): string {
