@@ -13,6 +13,7 @@ import { totalGuilds, totalUsers } from '../../../events/ready';
 import { config } from '../../../utils/config';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
 import pkg from '../../../../package.json';
+import { logger } from '../../../utils/log';
 
 /**
  * Botコマンド
@@ -36,16 +37,7 @@ class BotCommand extends CommandInteraction {
                 components: [buttons]
             });
         } catch (error) {
-            console.error('Botコマンドの実行中にエラーが発生しました:', error);
-            const errorMessage = {
-                content: 'コマンドの実行中にエラーが発生しました。しばらくしてからもう一度お試しください。',
-                ephemeral: true
-            };
-            if (interaction.deferred || interaction.replied) {
-                await interaction.editReply(errorMessage);
-            } else {
-                await interaction.reply(errorMessage);
-            }
+            logger.error('Botコマンドの実行中にエラーが発生しました: ', error);
         }
     }
 
