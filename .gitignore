@@ -3,3 +3,4 @@ node_modules/
 run/config.toml
 *.log
 *.env
+.vscode/
