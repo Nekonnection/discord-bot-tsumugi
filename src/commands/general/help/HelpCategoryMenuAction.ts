@@ -23,11 +23,15 @@ class HelpCategoryMenuAction extends MessageComponentActionInteraction<Component
      * @param interaction インタラクション
      */
     async onCommand(interaction: StringSelectMenuInteraction): Promise<void> {
-        const commandsCategoryList = helpCommand.commandsCategoryList();
+        const commandsCategoryList = await helpCommand.commandsCategoryList(); 
         const category = interaction.values[0];
-        const categoryIndex = (await commandsCategoryList).findIndex((cat) => cat.category === category);
-        const categoryEmbeds = await helpCommand.createCategoryEmbeds(interaction, await commandsCategoryList);
+
+        const categoryIndex = commandsCategoryList.findIndex((cat) => cat.category === category);
+        if (categoryIndex === -1) return;
+
+        const categoryEmbeds = await helpCommand.createCategoryEmbeds(interaction, commandsCategoryList);
         const categoryEmbed = categoryEmbeds[categoryIndex];
+        
         await interaction.update({
             embeds: [categoryEmbed]
         });

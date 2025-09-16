@@ -26,7 +26,7 @@ class HelpCommand extends AutocompleteCommandInteraction {
         .setUsage('`/help`, `/help ping`')
         .addStringOption((option) =>
             option.setName('command_name').setDescription('指定したコマンドの詳細情報を表示します。').setAutocomplete(true)
-        ) as SlashCommandBuilder;
+        ) as CustomSlashCommandBuilder;
     async onAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         const choices = focusedOption.name === 'command_name' ? await this.commandsList() : [];
@@ -64,36 +64,46 @@ class HelpCommand extends AutocompleteCommandInteraction {
         }
     }
     /**
-     * コマンドの詳細情報の埋め込みメッセージを作成する関数
+     * コマンドの詳細情報の埋め込みメッセージを作成するメソッド
      * @param interaction インタラクション
      * @param commandName コマンド名
      * @returns コマンドの詳細情報の埋め込みメッセージ
      */
     private async createCommandInfoEmbed(interaction: ChatInputCommandInteraction, commandName: string): Promise<EmbedBuilder> {
         const commandInfo = commandHandler._commands.find(
-            (command) => (command as CommandInteraction).command?.name === commandName
-        ) as CommandInteraction;
-        const defaultMemberPermissions = commandInfo?.command.default_member_permissions
-            ? BigInt(commandInfo.command.default_member_permissions)
-            : BigInt(0);
-        const defaultBotPermissions = commandInfo?.command.default_bot_permissions ? BigInt(commandInfo.command.default_bot_permissions) : BigInt(0);
-        const memberPermissionList = new PermissionTranslator(defaultMemberPermissions).permissionNames.join('\n') || 'なし';
-        const botPermissionList = new PermissionTranslator(defaultBotPermissions).permissionNames.join('\n') || 'なし';
-        const category = commandInfo?.command?.category || 'なし';
-        const usage = commandInfo?.command?.usage || '見つかりませんでした';
-        const description = commandInfo?.command?.description || 'なし';
+            (c) => (c as CommandInteraction).command?.name === commandName
+        ) as CommandInteraction | undefined;
+
+        if (!commandInfo?.command) {
+            return this.createBaseEmbed(interaction)
+                .setTitle('エラー')
+                .setDescription(`コマンド \`${commandName}\` は見つかりませんでした。`)
+        }
+
+        const {
+            description = '説明がありません',
+            category = '未分類',
+            usage = '使用方法が設定されていません',
+            default_member_permissions,
+            default_bot_permissions
+        } = commandInfo.command;
+
+        const memberPerms = BigInt(default_member_permissions || 0);
+        const botPerms = BigInt(default_bot_permissions || 0);
+
         const memberHasPermissions =
-            interaction.member?.permissions instanceof PermissionsBitField && interaction.member.permissions.has(defaultMemberPermissions);
+            typeof interaction.member?.permissions === 'object' && 'has' in interaction.member.permissions
+                ? (interaction.member.permissions as PermissionsBitField).has(memberPerms)
+                : false;
 
-        const botHasPermissions =
-            interaction.guild?.members.me?.permissions instanceof PermissionsBitField &&
-            interaction.guild.members.me.permissions.has(defaultBotPermissions);
+        const botHasPermissions = interaction.guild?.members.me?.permissions?.has(botPerms) ?? false;
+        const permissionStatus = memberHasPermissions && botHasPermissions ? 'はい' : 'いいえ';
 
-        const hasPermissions = memberHasPermissions && botHasPermissions;
-        const permissionStatus = hasPermissions ? 'はい' : 'いいえ';
+        const memberPermissionList = new PermissionTranslator(memberPerms).permissionNames.join('\n') || 'なし';
+        const botPermissionList = new PermissionTranslator(botPerms).permissionNames.join('\n') || 'なし';
 
-        return new EmbedBuilder()
-            .setAuthor({ name: `猫咲 紬 - コマンド詳細[${commandName}]`, iconURL: config.iconURL })
+        return this.createBaseEmbed(interaction)
+            .setAuthor({ name: `猫咲 紬 - コマンド詳細 [${commandName}]`, iconURL: config.iconURL })
             .setDescription(description)
             .addFields(
                 { name: 'カテゴリー', value: category },
@@ -101,13 +111,11 @@ class HelpCommand extends AutocompleteCommandInteraction {
                 { name: '実行可能か', value: permissionStatus, inline: true },
                 { name: 'ユーザーに必要な権限', value: memberPermissionList, inline: true },
                 { name: 'Botに必要な権限', value: botPermissionList, inline: true }
-            )
-            .setColor(Number(config.botColor))
-            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
+            );
     }
 
     /**
-     * ホームの埋め込みメッセージを作成する関数
+     * ホームの埋め込みメッセージを作成するメソッド
      * @param interaction インタラクション
      * @param commandsCategoryList コマンドカテゴリーリスト
      * @returns ホームの埋め込みメッセージ
@@ -116,18 +124,33 @@ class HelpCommand extends AutocompleteCommandInteraction {
         interaction: ChatInputCommandInteraction | StringSelectMenuInteraction,
         commandsCategoryList: { category: string; commands: { name: string; description: string }[] }[]
     ): Promise<EmbedBuilder> {
-        const categoryPages = commandsCategoryList.map((category, index) => `${index + 1}ページ目: ${category.category}`).join('\n');
+        const categoryPages = commandsCategoryList.length > 0
+            ? commandsCategoryList.map((category, index) => `${index + 1}ページ目: ${category.category}`).join('\n')
+            : '利用可能なコマンドカテゴリはありません。';
 
-        return new EmbedBuilder()
+        return this.createBaseEmbed(interaction)
             .setAuthor({ name: '猫咲 紬 - ヘルプ', iconURL: config.iconURL })
             .setDescription('コマンドの詳細情報は`/help [コマンド名]`で表示できます。')
-            .addFields({ name: '各カテゴリー', value: categoryPages })
-            .addFields({
-                name: 'Botを招待/サポートサーバー',
-                value: `[Botを招待する](${config.inviteURL})/[サポートサーバーに入る](${config.supportGuildURL})`
-            })
+            .addFields(
+                { name: '各カテゴリー', value: categoryPages },
+                {
+                    name: 'Botを招待/サポートサーバー',
+                    value: `[Botを招待する](${config.inviteURL}) / [サポートサーバーに入る](${config.supportGuildURL})`
+                }
+            );
+    }
+    /**
+     * Embedの基本的な設定を共通化するメソッド
+     * @param interaction インタラクションオブジェクト
+     * @returns 基本設定が適用されたEmbedBuilder
+     */
+    private createBaseEmbed(interaction: ChatInputCommandInteraction | StringSelectMenuInteraction): EmbedBuilder {
+        return new EmbedBuilder()
             .setColor(Number(config.botColor))
-            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() || undefined });
+            .setFooter({
+                text: `実行者: ${interaction.user.displayName}`,
+                iconURL: interaction.user.displayAvatarURL() || undefined
+            });
     }
     /**
      * カテゴリーごとの埋め込みメッセージを作成する関数
@@ -159,12 +182,10 @@ class HelpCommand extends AutocompleteCommandInteraction {
     public async commandsCategoryList(): Promise<{ category: string; commands: { name: string; description: string }[] }[]> {
         const commandsCategory: { [category: string]: { name: string; description: string }[] } = {};
 
-        // コマンドをカテゴリーごとに分類
         await Promise.all(
             commandHandler._commands.map(async (command) => {
                 if (!command.command) return;
                 const category = (command as CommandInteraction).command.category || undefined;
-                // カテゴリーがない場合は無視(コマンド処理以外のクラス)
                 if (!category) return;
                 if (!commandsCategory[category]) {
                     commandsCategory[category] = [];
@@ -187,19 +208,14 @@ class HelpCommand extends AutocompleteCommandInteraction {
      * @returns コマンドリスト
      */
     private async commandsList(): Promise<string[]> {
-        const commands: string[] = [];
-        commandHandler._commands.map((command) => {
-            if (!command.command) return;
-            const category = (command as CommandInteraction).command.category || undefined;
-            if (!category) return;
-
-            const commandName = command.command?.name ?? '';
-
-            // コマンドをリストに追加
-            commands.push(`${commandName}`);
-        });
-
-        return commands;
+        const commandNames: string[] = [];
+        for (const command of commandHandler._commands) {
+            const customCommand = command as CommandInteraction;
+            if (customCommand.command && customCommand.command.category) {
+                commandNames.push(customCommand.command.name);
+            }
+        }
+        return commandNames;
     }
 }
 
