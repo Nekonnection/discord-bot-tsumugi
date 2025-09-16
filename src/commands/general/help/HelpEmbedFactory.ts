@@ -11,12 +11,11 @@ type HelpInteraction = ChatInputCommandInteraction | StringSelectMenuInteraction
  * ヘルプ関連のEmbedを生成するファクトリクラス (Singleton)
  */
 class HelpEmbedFactory {
-    private static instance: HelpEmbedFactory;
+    private static instance: HelpEmbedFactory = new HelpEmbedFactory();
     /**
      * シングルトンインスタンスを取得する
      */
     public static getInstance(): HelpEmbedFactory {
-        HelpEmbedFactory.instance = new HelpEmbedFactory();
         return HelpEmbedFactory.instance;
     }
 

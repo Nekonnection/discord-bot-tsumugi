@@ -15,13 +15,12 @@ export interface CategorizedCommands {
  * コマンド情報を一元管理するサービスクラス
  */
 class CommandService {
-    private static instance: CommandService;
+    private static instance: CommandService = new CommandService();
     private commands: CommandInteraction[] = [];
     /**
      * シングルトンインスタンスを取得する
      */
     public static getInstance(): CommandService {
-        CommandService.instance = new CommandService();
         return CommandService.instance;
     }
     /**
