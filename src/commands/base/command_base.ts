@@ -82,7 +82,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     }
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: ChatInputCommandInteraction): Promise<void> {
+    override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand() || !this.isMyInteraction(interaction)) return;
 
         const permissionChecker = new PermissionChecker(this.command);
@@ -140,7 +140,7 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
  * オートコンプリート付きコマンド
  */
 export abstract class AutocompleteCommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: SlashCommandBuilder;
+    abstract command: CustomSlashCommandBuilder;
 
     /** @inheritdoc */
     override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
@@ -155,7 +155,7 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
     /** @inheritdoc */
     override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (interaction.isChatInputCommand() && this.isMyInteraction(interaction)) {
-            const permissionChecker = new PermissionChecker(this.command as CustomSlashCommandBuilder);
+            const permissionChecker = new PermissionChecker(this.command);
 
             if (!(await permissionChecker.checkPermissions(interaction))) return;
             await this.onCommand(interaction);
@@ -178,37 +178,53 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
 /**
  * 権限を確認するクラス
  */
-class PermissionChecker {
+export class PermissionChecker {
     private command: CustomSlashCommandBuilder;
 
     constructor(command: CustomSlashCommandBuilder) {
         this.command = command;
     }
-
+    /**
+     * Botとメンバーの権限を確認します。
+     * @param interaction インタラクション
+     * @returns 権限が満たされている場合はtrue、そうでない場合はfalse
+     */
     async checkPermissions(interaction: ChatInputCommandInteraction): Promise<boolean> {
         const botPermissions = interaction.guild?.members.me?.permissions;
-        const memberPermissions = interaction.member?.permissions;
+        const requiredBotPerms = this.command.default_bot_permissions;
 
-        if (this.command.default_bot_permissions && !botPermissions?.has(this.command.default_bot_permissions as PermissionResolvable)) {
-            await interaction.reply({
-                content: 'Botに必要な権限がありません',
-                flags: MessageFlags.Ephemeral
-            });
-            return false;
+        if (requiredBotPerms && botPermissions) {
+            const requiredPermsField = new PermissionsBitField(requiredBotPerms as PermissionResolvable);
+            if (!botPermissions.has(requiredPermsField)) {
+                const missingPerms = requiredPermsField
+                    .toArray()
+                    .filter(p => !botPermissions.has(p));
+                
+                await interaction.reply({
+                    content: `Botに必要な権限が不足しています。\n不足している権限: \`${missingPerms.join(', ')}\``,
+                    flags: MessageFlags.Ephemeral
+                });
+                return false;
+            }
         }
 
-        if (
-            this.command.default_member_permissions &&
-            !(
-                memberPermissions instanceof PermissionsBitField &&
-                memberPermissions.has(this.command.default_member_permissions as PermissionResolvable)
-            )
-        ) {
-            await interaction.reply({
-                content: 'あなたに必要な権限がありません',
-                flags: MessageFlags.Ephemeral
-            });
-            return false;
+        // メンバーの権限をチェック
+        const memberPermissions = interaction.member?.permissions;
+        const requiredMemberPerms = this.command.default_member_permissions;
+
+        if (requiredMemberPerms && memberPermissions instanceof PermissionsBitField) {
+            const requiredPermsField = new PermissionsBitField(requiredMemberPerms as PermissionResolvable);
+            if (!memberPermissions.has(requiredPermsField)) {
+                 const missingPerms = requiredPermsField
+                    .toArray()
+                    .filter(p => !memberPermissions.has(p));
+
+                await interaction.reply({
+                    content: `コマンドの実行に必要な権限が不足しています。\n不足している権限: \`${missingPerms.join(', ')}\``,
+                    flags: MessageFlags.Ephemeral
+                });
+                return false;
+            }
         }
 
         return true;
