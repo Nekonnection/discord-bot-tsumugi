@@ -2,9 +2,13 @@
 clientId = ""
 # 開発用サーバーID
 guildId = ""
-# BOTのカラーコード
+# Botのカラーコード
 botColor = ""
-# BOTのアイコンURL
+# BotのアイコンURL
 iconURL = ""
-# BOTの招待リンク
+# Botの招待リンク
 inviteURL = ""
+# BotのアナウンスチャンネルID
+announcementChannelId = ""
+# サポートサーバーの招待リンク
+supportGuildURL = ""

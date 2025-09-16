@@ -7,19 +7,21 @@ export abstract class EventBase<K extends keyof ClientEvents> {
     /**
      * イベント名
      */
-    abstract eventName: K;
+    protected abstract eventName: K;
 
     /**
      * イベントリスナー
      * @param args イベント引数
      */
-    abstract listener(...args: ClientEvents[K]): void;
+    protected abstract listener(...args: ClientEvents[K]): Promise<void>;
 
     /**
      * イベントを登録する関数
      * @param client Discordクライアント
      */
-    register(client: Client): void {
-        client.on(this.eventName, this.listener);
+    public register(client: Client): void {
+        client.on(this.eventName, (...args) => {
+            void this.listener(...args);
+        });
     }
 }

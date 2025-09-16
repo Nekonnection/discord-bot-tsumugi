@@ -1,9 +1,11 @@
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import dotenv from 'dotenv';
-import EventHandler from './events/EventHandler';
-import events from './events/events';
-import CommandHandler from './commands/CommandHandler';
-import commands from './commands/commands';
+
+import CommandHandler from './commands/CommandHandler.js';
+import commands from './commands/commands.js';
+import EventHandler from './events/EventHandler.js';
+import events from './events/events.js';
+import CommandService from './services/CommandService.js';
 
 /**
  * .envファイルを読み込む
@@ -28,6 +30,7 @@ export const client: Client = new Client({
  * コマンドハンドラーを初期化する
  */
 export const commandHandler = new CommandHandler(commands);
+CommandService.initialize(commandHandler);
 
 /**
  * イベントハンドラーを登録する
@@ -36,4 +39,4 @@ const eventHandler = new EventHandler(events);
 eventHandler.registerEvents(client);
 
 // Discord Botのログイン
-client.login(process.env.DISCORD_TOKEN);
+void client.login(process.env.DISCORD_TOKEN);

@@ -1,30 +1,39 @@
 {
-  "name": "discord-bot-template",
-  "version": "1.0.0",
-  "description": "TypeScript templates for development in Discord.js",
+  "name": "discord-bot-tsumugi",
+  "version": "3.0.0",
+  "description": "「可愛くて、楽しい」DiscordBot",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "test": "ts-node src/index.ts",
     "start": "node dist/index.js",
     "compile": "tsc -p .",
     "lint:prettier": "prettier --check src",
-    "fix:prettier": "prettier --write src"
+    "fix:prettier": "prettier --write src",
+    "lint:eslint": "eslint .",
+    "fix:eslint": "eslint . --fix"
   },
   "keywords": [],
-  "author": "",
+  "author": "NekosanQ",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.3.1",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "log4js": "^6.9.1",
     "toml": "^3.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.35.0",
     "@types/node": "^20.14.2",
-    "eslint": "^9.4.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.3.1",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.44.0"
   }
 }

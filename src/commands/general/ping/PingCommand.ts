@@ -1,22 +1,23 @@
-import { ChatInputCommandInteraction, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
-import { CommandInteraction } from '../../base/command_base';
-import { config } from '../../../utils/config';
+import { ChatInputCommandInteraction, EmbedBuilder, Message } from 'discord.js';
+
+import { config } from '../../../utils/config.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { CommandInteraction } from '../../base/command_base.js';
 /**
  * Pingコマンド
  */
-class PingCommands extends CommandInteraction {
-    category = '一般';
-    command = new SlashCommandBuilder().setName('ping').setDescription('Pingを表示します');
+class PingCommand extends CommandInteraction {
+    public command = new CustomSlashCommandBuilder().setName('ping').setDescription('Pingを表示します').setCategory('一般').setUsage('`/ping`');
 
-    async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+        await interaction.deferReply();
         const pingEmbed = this.createEmbed(interaction, 'Pingを測定中...', false);
 
-        await interaction.reply({
-            embeds: [pingEmbed],
-            allowedMentions: { repliedUser: false }
+        await interaction.editReply({
+            embeds: [pingEmbed]
         });
 
-        const message: Message<boolean> = await interaction.fetchReply();
+        const message: Message = await interaction.fetchReply();
         const updatedPingEmbed = this.createEmbed(interaction, 'Pingを測定しました', true, message);
 
         await interaction.editReply({
@@ -24,29 +25,28 @@ class PingCommands extends CommandInteraction {
         });
     }
     /**
-     * 埋め込みメッセージを作成します
+     * 埋め込みメッセージを作成する関数
      * @param interaction インタラクション
      * @param title タイトル
      * @param isUpdate アップデートかどうか
      * @param message メッセージ
      * @returns 埋め込みメッセージ
      */
-    private createEmbed(interaction: ChatInputCommandInteraction, title: string, isUpdate: boolean, message?: Message<boolean>): EmbedBuilder {
+    private createEmbed(interaction: ChatInputCommandInteraction, title: string, isUpdate: boolean, message?: Message): EmbedBuilder {
         const embed = new EmbedBuilder()
             .setTitle(title)
             .setColor(Number(config.botColor))
-            .setTimestamp()
-            .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.avatarURL() || undefined });
+            .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.displayAvatarURL() || undefined });
 
         if (isUpdate && message) {
             embed.setFields(
                 {
                     name: 'WebSocket Ping',
-                    value: `${interaction.client.ws.ping}ms`
+                    value: `${String(interaction.client.ws.ping)}ms`
                 },
                 {
                     name: 'APIレイテンシ',
-                    value: `${message.createdTimestamp - interaction.createdTimestamp}ms`
+                    value: `${String(message.createdTimestamp - interaction.createdTimestamp)}ms`
                 }
             );
         }
@@ -55,4 +55,4 @@ class PingCommands extends CommandInteraction {
     }
 }
 
-export default new PingCommands();
+export default new PingCommand();
