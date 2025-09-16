@@ -54,7 +54,6 @@ class BotCommand extends CommandInteraction {
             .setColor(Number(config.botColor))
             .setThumbnail(config.iconURL)
             .addFields(
-                // addFieldsに配列を渡すことで、より簡潔に記述できます。
                 { name: '名前', value: `${interaction.client.user?.username} (Tsumugi Byousaki)`, inline: false },
                 { name: '作成日', value: time(botCreatedAt, TimestampStyles.RelativeTime), inline: true },
                 { name: 'バージョン', value: pkg.version, inline: true },
