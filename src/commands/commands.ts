@@ -7,6 +7,7 @@ import botCommand from './general/bot/BotCommand.js';
 import followCommand from '../commands/general/follow/FollowCommand.js';
 import omikujiCommand from './fun/omikuji/OmikujiCommand.js';
 import slotCommand from './fun/slot/SlotCommand.js';
+import rpsCommand from './fun/rps/rpsCommand.js';
 
 const commands: InteractionBase[] = [
     pingCommand,
@@ -16,7 +17,8 @@ const commands: InteractionBase[] = [
     botCommand,
     omikujiCommand,
     followCommand,
-    slotCommand
+    slotCommand,
+    rpsCommand,
 ];
 
 export default commands;
