@@ -3,10 +3,9 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import { type } from 'os'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default [
     /**
      * 推奨される基本設定
      */
@@ -84,16 +83,6 @@ export default tseslint.config(
         },
     },
     /**
-     * Prettierとの競合を避ける設定
-     */
-    {
-        ...eslintPluginPrettierRecommended,
-        rules: {
-            ...eslintConfigPrettier.rules,
-            'prettier/prettier': 'error',
-        },
-    },
-    /**
      * 無視するファイル・ディレクトリ
      */
     {
@@ -105,4 +94,9 @@ export default tseslint.config(
             '.env',
         ],
     },
-)
+    /**
+     * Prettierとの競合を避ける設定
+     */
+    eslintPluginPrettierRecommended,
+    eslintConfigPrettier,
+]
