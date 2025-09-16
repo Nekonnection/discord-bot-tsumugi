@@ -1,25 +1,26 @@
 import { SlashCommandBuilder } from 'discord.js';
 
 class CustomSlashCommandBuilder extends SlashCommandBuilder {
-    category?: string;
-    usage?: string;
-    default_bot_permissions: string | undefined;
+    public category?: string;
+    public usage?: string;
+    public defaultBotPermissions?: string;
 
-    constructor() {
+    public constructor() {
         super();
     }
 
-    setCategory(category: string): this {
+    public setCategory(category: string): this {
         this.category = category;
         return this;
     }
 
-    setUsage(usage: string) {
+    public setUsage(usage: string): this {
         this.usage = usage;
         return this;
     }
-    setDefaultBotPermissions(permissions: bigint | number | null | undefined): this {
-        this.default_bot_permissions = permissions?.toString();
+
+    public setDefaultBotPermissions(permissions: bigint | number | null | undefined): this {
+        this.defaultBotPermissions = permissions?.toString();
         return this;
     }
 }

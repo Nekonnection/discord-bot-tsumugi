@@ -1,37 +1,26 @@
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ChatInputCommandInteraction,
-    EmbedBuilder,
-    time,
-    TimestampStyles
-} from 'discord.js';
-import { CommandInteraction } from '../../base/command_base';
-import { client } from '../../..';
-import { totalGuilds, totalUsers } from '../../../events/ready';
-import { config } from '../../../utils/config';
-import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
-import pkg from '../../../../package.json';
-import { logger } from '../../../utils/log';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, time, TimestampStyles } from 'discord.js';
+
+import pkg from '../../../../package.json' with { type: 'json' };
+import ReadyEvent from '../../../events/ready.js';
+import { client } from '../../../index.js';
+import { config } from '../../../utils/config.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { logger } from '../../../utils/log.js';
+import { CommandInteraction } from '../../base/command_base.js';
 
 /**
  * Botコマンド
  */
 class BotCommand extends CommandInteraction {
-    readonly command = new CustomSlashCommandBuilder()
-        .setName('bot')
-        .setDescription('Botの情報を表示します')
-        .setCategory('一般')
-        .setUsage('`/bot`');
+    public command = new CustomSlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します').setCategory('一般').setUsage('`/bot`');
 
-    async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
             await interaction.deferReply();
 
             const embed = this.createEmbed(interaction);
             const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(this.createButtons());
-            
+
             await interaction.editReply({
                 embeds: [embed],
                 components: [buttons]
@@ -47,18 +36,18 @@ class BotCommand extends CommandInteraction {
      * @returns 埋め込みメッセージ
      */
     private createEmbed(interaction: ChatInputCommandInteraction): EmbedBuilder {
-        const botCreatedAt = client.user?.createdAt || new Date();
+        const botCreatedAt = client.user?.createdAt ?? new Date();
 
         return new EmbedBuilder()
-            .setAuthor({ name: `${interaction.client.user?.username}の情報`, iconURL: config.iconURL })
+            .setAuthor({ name: `${interaction.client.user.username}の情報`, iconURL: config.iconURL })
             .setColor(Number(config.botColor))
             .setThumbnail(config.iconURL)
             .addFields(
-                { name: '名前', value: `${interaction.client.user?.username} (Tsumugi Byousaki)`, inline: false },
+                { name: '名前', value: `${interaction.client.user.username} (Tsumugi Byousaki)`, inline: false },
                 { name: '作成日', value: time(botCreatedAt, TimestampStyles.RelativeTime), inline: true },
                 { name: 'バージョン', value: pkg.version, inline: true },
-                { name: '導入サーバー数', value: totalGuilds.toString(), inline: true },
-                { name: '総ユーザー数', value: totalUsers.toString(), inline: true }
+                { name: '導入サーバー数', value: ReadyEvent.checkTotalGuilds(), inline: true },
+                { name: '総ユーザー数', value: ReadyEvent.checkTotalUsers(), inline: true }
             )
             .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() });
     }

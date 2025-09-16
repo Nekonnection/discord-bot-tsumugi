@@ -1,17 +1,22 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { CommandInteraction } from '../../base/command_base';
-import { config } from '../../../utils/config';
-import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+
+import { config } from '../../../utils/config.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { CommandInteraction } from '../../base/command_base.js';
 
 /**
  * おみくじコマンド
  */
 class OmikujiCommand extends CommandInteraction {
-    command = new CustomSlashCommandBuilder().setName('omikuji').setDescription('おみくじが引けます').setCategory('お遊び系').setUsage('`/omikuji`');
+    public command = new CustomSlashCommandBuilder()
+        .setName('omikuji')
+        .setDescription('おみくじが引けます')
+        .setCategory('お遊び系')
+        .setUsage('`/omikuji`');
 
-    async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
-        const embed = await this.createEmbed(interaction);
+        const embed = this.createEmbed(interaction);
         await interaction.editReply({
             embeds: [embed]
         });
@@ -21,8 +26,8 @@ class OmikujiCommand extends CommandInteraction {
      * @param interaction インタラクション
      * @returns 埋め込みメッセージ
      */
-    private async createEmbed(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
-        const omikuji = await this.createOmikuji();
+    private createEmbed(interaction: ChatInputCommandInteraction): EmbedBuilder {
+        const omikuji = this.createOmikuji();
         return new EmbedBuilder()
             .setTitle(`${interaction.user.displayName}さんのおみくじの結果`)
             .setDescription(omikuji)
@@ -33,14 +38,14 @@ class OmikujiCommand extends CommandInteraction {
      * おみくじを作成する関数
      * @returns おみくじの結果
      */
-    private async createOmikuji(): Promise<string> {
-        const fortune = await this.selectFortune();
-        const hope = await this.selectHope();
-        const lostItem = await this.selectLostItem();
-        const learning = await this.selectLearning();
-        const conflict = await this.selectConflict();
-        const love = await this.selectLove();
-        const disease = await this.selectDisease();
+    private createOmikuji(): string {
+        const fortune = this.selectFortune();
+        const hope = this.selectHope();
+        const lostItem = this.selectLostItem();
+        const learning = this.selectLearning();
+        const conflict = this.selectConflict();
+        const love = this.selectLove();
+        const disease = this.selectDisease();
 
         const omikujiResult = `
         **運勢**
@@ -61,7 +66,7 @@ class OmikujiCommand extends CommandInteraction {
      * 運勢を選択する関数
      * @returns 運勢
      */
-    private async selectFortune(): Promise<string> {
+    private selectFortune(): string {
         const fortuneList = [
             { fortune: '大吉', probability: 20 },
             { fortune: '中吉', probability: 15 },
@@ -72,10 +77,10 @@ class OmikujiCommand extends CommandInteraction {
             { fortune: '大凶', probability: 2 }
         ];
 
-        let totalProbability = fortuneList.reduce((acc, item) => acc + item.probability, 0);
+        const totalProbability = fortuneList.reduce((acc, item) => acc + item.probability, 0);
         let random = Math.floor(Math.random() * totalProbability);
 
-        let selectedFortune = fortuneList.find((item) => {
+        const selectedFortune = fortuneList.find((item) => {
             if (random < item.probability) {
                 return true;
             }
@@ -90,7 +95,7 @@ class OmikujiCommand extends CommandInteraction {
      * @param list アイテムのリスト
      * @returns ランダムに選ばれたアイテム
      */
-    private async selectRandomItem(list: string[]): Promise<string> {
+    private selectRandomItem(list: string[]): string {
         return list[Math.floor(Math.random() * list.length)];
     }
 
@@ -98,7 +103,7 @@ class OmikujiCommand extends CommandInteraction {
      * 願望を選択する関数
      * @returns 願望
      */
-    private async selectHope(): Promise<string> {
+    private selectHope(): string {
         const hopeList = ['叶う', '全力で願え', '日頃の行いによりけり', '良い事を沢山せよ 叶う', '叶うであろう だが油断禁物。', '叶わない事ありけり'];
         return this.selectRandomItem(hopeList);
     }
@@ -107,7 +112,7 @@ class OmikujiCommand extends CommandInteraction {
      * 失物を選択する関数
      * @returns 失物
      */
-    private async selectLostItem(): Promise<string> {
+    private selectLostItem(): string {
         const lostItemList = [
             '出る',
             '出るであろう 下',
@@ -125,7 +130,7 @@ class OmikujiCommand extends CommandInteraction {
      * 学問を選択する関数
      * @returns 学問
      */
-    private async selectLearning(): Promise<string> {
+    private selectLearning(): string {
         const learningList = ['安心して勉学せよ', '勉学すればよろし', '勉学を推奨する', '困難。勉学せよ', '全力を尽くせ', '自己の甘えを捨てよ'];
         return this.selectRandomItem(learningList);
     }
@@ -134,7 +139,7 @@ class OmikujiCommand extends CommandInteraction {
      * 争事を選択する関数
      * @returns 争事
      */
-    private async selectConflict(): Promise<string> {
+    private selectConflict(): string {
         const conflictList = [
             '勝てる 油断禁物',
             '勝てるであろう',
@@ -152,7 +157,7 @@ class OmikujiCommand extends CommandInteraction {
      * 恋愛を選択する関数
      * @returns 恋愛
      */
-    private async selectLove(): Promise<string> {
+    private selectLove(): string {
         const loveList = ['この人を逃すな', '自分磨きをせよ', '感情を抑えよ', '見た目で選ぶな', '中身で選べ', '積極的になれ', '日頃の行いによりけり'];
         return this.selectRandomItem(loveList);
     }
@@ -161,7 +166,7 @@ class OmikujiCommand extends CommandInteraction {
      * 病気を選択する関数
      * @returns 病気
      */
-    private async selectDisease(): Promise<string> {
+    private selectDisease(): string {
         const diseaseList = [
             '信じろ なおる',
             '医者への信心第一',

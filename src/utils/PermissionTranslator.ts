@@ -1,61 +1,84 @@
+import { PermissionsBitField } from 'discord.js';
+
 /**
- * bigint型で渡された権限を日本語の配列に変換するクラス
+ * Discord APIの権限名（英語）とBigIntフラグのマッピング
+ * PermissionsBitField.Flags を利用して、手動での定義を不要にし、正確性を担保します。
  */
-export class PermissionTranslator {
-    private static permissionFlags: { [key: string]: bigint } = {
-        インスタント招待の作成: 1n << 0n,
-        メンバーのキック: 1n << 1n,
-        メンバーのBAN: 1n << 2n,
-        管理者: 1n << 3n,
-        チャンネルの管理: 1n << 4n,
-        サーバーの管理: 1n << 5n,
-        リアクションの追加: 1n << 6n,
-        監査ログの閲覧: 1n << 7n,
-        優先スピーカー: 1n << 8n,
-        ストリーム: 1n << 9n,
-        チャンネルの閲覧: 1n << 10n,
-        メッセージの送信: 1n << 11n,
-        TTSメッセージの送信: 1n << 12n,
-        メッセージの管理: 1n << 13n,
-        リンクの埋め込み: 1n << 14n,
-        ファイルの添付: 1n << 15n,
-        メッセージ履歴の閲覧: 1n << 16n,
-        everyoneのメンション: 1n << 17n,
-        外部の絵文字の使用: 1n << 18n,
-        サーバーのインサイトの閲覧: 1n << 19n,
-        接続: 1n << 20n,
-        発言: 1n << 21n,
-        メンバーのミュート: 1n << 22n,
-        メンバーのスピーカーミュート: 1n << 23n,
-        メンバーの移動: 1n << 24n,
-        音声アクティビティの使用: 1n << 25n,
-        ニックネームの変更: 1n << 26n,
-        ニックネームの管理: 1n << 27n,
-        ロールの管理: 1n << 28n,
-        Webhookの管理: 1n << 29n,
-        絵文字とステッカーの管理: 1n << 30n,
-        アプリケーションコマンドの使用: 1n << 31n,
-        発言のリクエスト: 1n << 32n,
-        スレッドの管理: 1n << 34n,
-        公開スレッドの使用: 1n << 35n,
-        プライベートスレッドの使用: 1n << 36n,
-        外部のステッカーの使用: 1n << 37n,
-        スレッドでのメッセージ送信: 1n << 38n,
-        埋め込みアクティビティの開始: 1n << 39n,
-        メンバーのモデレーション: 1n << 40n
-    };
+const flags = PermissionsBitField.Flags;
 
-    private bitfield: bigint | undefined;
-    public permissionNames: string[];
+/**
+ * 権限名（英語キー）と日本語名のマッピング
+ */
+const names: Record<string, string> = {
+    createInstantInvite: 'インスタント招待の作成',
+    kickMembers: 'メンバーのキック',
+    banMembers: 'メンバーのBAN',
+    administrator: '管理者',
+    manageChannels: 'チャンネルの管理',
+    manageGuild: 'サーバーの管理',
+    addReactions: 'リアクションの追加',
+    viewAuditLog: '監査ログの閲覧',
+    prioritySpeaker: '優先スピーカー',
+    stream: 'ストリーム',
+    viewChannel: 'チャンネルの閲覧',
+    sendMessages: 'メッセージの送信',
+    sendTTSMessages: 'TTSメッセージの送信',
+    manageMessages: 'メッセージの管理',
+    embedLinks: 'リンクの埋め込み',
+    attachFiles: 'ファイルの添付',
+    readMessageHistory: 'メッセージ履歴の閲覧',
+    mentionEveryone: 'everyoneのメンション',
+    useExternalEmojis: '外部の絵文字の使用',
+    viewGuildInsights: 'サーバーのインサイトの閲覧',
+    connect: '接続',
+    speak: '発言',
+    muteMembers: 'メンバーのミュート',
+    deafenMembers: 'メンバーのスピーカーミュート',
+    moveMembers: 'メンバーの移動',
+    useVAD: '音声アクティビティの使用',
+    changeNickname: 'ニックネームの変更',
+    manageNicknames: 'ニックネームの管理',
+    manageRoles: 'ロールの管理',
+    manageWebhooks: 'Webhookの管理',
+    manageGuildExpressions: '絵文字とステッカーの管理',
+    useApplicationCommands: 'アプリケーションコマンドの使用',
+    requestToSpeak: '発言のリクエスト',
+    manageThreads: 'スレッドの管理',
+    usePublicThreads: '公開スレッドの使用',
+    usePrivateThreads: 'プライベートスレッドの使用',
+    useExternalStickers: '外部のステッカーの使用',
+    sendMessagesInThreads: 'スレッドでのメッセージ送信',
+    useEmbeddedActivities: '埋め込みアクティビティの開始',
+    moderateMembers: 'メンバーのモデレーション',
+    viewCreatorMonetizationAnalytics: 'クリエイター収益アナリティクスの表示',
+    useSoundboard: 'サウンドボードの使用',
+    useExternalSounds: '外部のサウンドを使用',
+    sendVoiceMessages: 'ボイスメッセージを送信'
+};
 
-    constructor(bitfield: bigint | undefined) {
-        this.bitfield = bitfield;
-        this.permissionNames = this.bitfield !== undefined ? this.getPermissions() : [];
+/**
+ * 権限ビットフィールドを日本語の権限名配列に変換します。
+ * @param bitfield 変換したい権限ビットフィールド
+ * @returns 権限名の配列
+ */
+export function translatePermission(bitfield: bigint | undefined): string[] {
+    if (!bitfield) {
+        return [];
     }
 
-    private getPermissions(): string[] {
-        return Object.keys(PermissionTranslator.permissionFlags)
-            .filter((flag) => this.bitfield! & PermissionTranslator.permissionFlags[flag])
-            .map((flag) => flag);
+    // 「管理者」権限は全ての権限を包含するため、特別扱いする
+    if ((bitfield & flags.Administrator) === flags.Administrator) {
+        return [`${names.administrator} (すべての権限)`];
     }
+
+    const resolved: string[] = [];
+    for (const key in flags) {
+        const permissionKey = key as keyof typeof flags;
+        const flag = flags[permissionKey];
+
+        if ((bitfield & flag) === flag) {
+            resolved.push(names[permissionKey]);
+        }
+    }
+    return resolved;
 }

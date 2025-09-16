@@ -6,13 +6,13 @@ import {
     MessageFlags,
     PermissionResolvable,
     PermissionsBitField,
-    SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
     SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
-import { InteractionBase } from './interaction_base';
-import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder';
+
+import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js';
+import { InteractionBase } from './interaction_base.js';
 /**
  * コマンドベースのインタラクション
  */
@@ -29,15 +29,15 @@ interface CommandBasedInteraction {
  * コマンドグループ
  */
 export abstract class CommandGroupInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: SlashCommandSubcommandsOnlyBuilder;
+    public abstract command: SlashCommandSubcommandsOnlyBuilder;
 
     /** @inheritdoc */
-    override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
+    public override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
         commandList.push(this.command);
     }
 
     /** @inheritdoc */
-    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+    public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.commandName === this.command.name;
     }
 }
@@ -45,23 +45,23 @@ export abstract class CommandGroupInteraction extends InteractionBase implements
  * サブコマンドグループ
  */
 export abstract class SubcommandGroupInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: SlashCommandSubcommandGroupBuilder;
+    public abstract command: SlashCommandSubcommandGroupBuilder;
 
     /**
      * コンストラクタ
      * @param _registry サブコマンドグループを登録する先
      */
-    constructor(private _registry: CommandGroupInteraction) {
+    public constructor(private _registry: CommandGroupInteraction) {
         super();
     }
 
     /** @inheritdoc */
-    override registerSubCommands(): void {
+    public override registerSubCommands(): void {
         this._registry.command.addSubcommandGroup(this.command);
     }
 
     /** @inheritdoc */
-    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+    public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.options.getSubcommandGroup() === this.command.name && this._registry.isMyInteraction(interaction);
     }
 }
@@ -69,20 +69,20 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
  * コマンド
  */
 export abstract class CommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: CustomSlashCommandBuilder;
+    public abstract command: CustomSlashCommandBuilder;
 
     /** @inheritdoc */
-    override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
+    public override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
         commandList.push(this.command);
     }
 
     /** @inheritdoc */
-    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+    public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.commandName === this.command.name;
     }
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: Interaction): Promise<void> {
+    public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand() || !this.isMyInteraction(interaction)) return;
 
         const permissionChecker = new PermissionChecker(this.command);
@@ -96,35 +96,35 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
      * コマンドが実行されたときに呼ばれる関数
      * @param interaction インタラクション
      */
-    abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
+    protected abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
 }
 
 /**
  * サブコマンド
  */
 export abstract class SubCommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: SlashCommandSubcommandBuilder;
+    public abstract command: SlashCommandSubcommandBuilder;
 
     /**
      * コンストラクタ
      * @param _registry サブコマンドグループを登録する先
      */
-    constructor(private _registry: CommandGroupInteraction | SubcommandGroupInteraction) {
+    public constructor(private _registry: CommandGroupInteraction | SubcommandGroupInteraction) {
         super();
     }
 
     /** @inheritdoc */
-    override registerSubCommands(): void {
+    public override registerSubCommands(): void {
         this._registry.command.addSubcommand(this.command);
     }
 
     /** @inheritdoc */
-    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+    public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.options.getSubcommand() === this.command.name && this._registry.isMyInteraction(interaction);
     }
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: Interaction): Promise<void> {
+    public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) return;
         if (!this.isMyInteraction(interaction)) return;
         await this.onCommand(interaction);
@@ -134,26 +134,26 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
      * コマンドが実行されたときに呼ばれる関数
      * @param interaction インタラクション
      */
-    abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
+    public abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
 }
 /**
  * オートコンプリート付きコマンド
  */
 export abstract class AutocompleteCommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    abstract command: CustomSlashCommandBuilder;
+    public abstract command: CustomSlashCommandBuilder;
 
     /** @inheritdoc */
-    override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
+    public override registerCommands(commandList: ApplicationCommandDataResolvable[]): void {
         commandList.push(this.command);
     }
 
     /** @inheritdoc */
-    isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
+    public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.commandName === this.command.name;
     }
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: Interaction): Promise<void> {
+    public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (interaction.isChatInputCommand() && this.isMyInteraction(interaction)) {
             const permissionChecker = new PermissionChecker(this.command);
 
@@ -168,12 +168,12 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
      * コマンドが実行されたときに呼ばれる関数
      * @param interaction インタラクション
      */
-    abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
+    protected abstract onCommand(interaction: ChatInputCommandInteraction): Promise<void>;
     /**
      * オートコンプリートが実行されたときに呼ばれる関数
      * @param interaction インタラクション
      */
-    abstract onAutocomplete(interaction: AutocompleteInteraction): Promise<void>;
+    protected abstract onAutocomplete(interaction: AutocompleteInteraction): Promise<void>;
 }
 /**
  * 権限を確認するクラス
@@ -181,7 +181,7 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
 export class PermissionChecker {
     private command: CustomSlashCommandBuilder;
 
-    constructor(command: CustomSlashCommandBuilder) {
+    public constructor(command: CustomSlashCommandBuilder) {
         this.command = command;
     }
     /**
@@ -189,17 +189,15 @@ export class PermissionChecker {
      * @param interaction インタラクション
      * @returns 権限が満たされている場合はtrue、そうでない場合はfalse
      */
-    async checkPermissions(interaction: ChatInputCommandInteraction): Promise<boolean> {
+    public async checkPermissions(interaction: ChatInputCommandInteraction): Promise<boolean> {
         const botPermissions = interaction.guild?.members.me?.permissions;
-        const requiredBotPerms = this.command.default_bot_permissions;
+        const requiredBotPerms = this.command.defaultBotPermissions;
 
         if (requiredBotPerms && botPermissions) {
             const requiredPermsField = new PermissionsBitField(requiredBotPerms as PermissionResolvable);
             if (!botPermissions.has(requiredPermsField)) {
-                const missingPerms = requiredPermsField
-                    .toArray()
-                    .filter(p => !botPermissions.has(p));
-                
+                const missingPerms = requiredPermsField.toArray().filter((p) => !botPermissions.has(p));
+
                 await interaction.reply({
                     content: `Botに必要な権限が不足しています。\n不足している権限: \`${missingPerms.join(', ')}\``,
                     flags: MessageFlags.Ephemeral
@@ -215,9 +213,7 @@ export class PermissionChecker {
         if (requiredMemberPerms && memberPermissions instanceof PermissionsBitField) {
             const requiredPermsField = new PermissionsBitField(requiredMemberPerms as PermissionResolvable);
             if (!memberPermissions.has(requiredPermsField)) {
-                 const missingPerms = requiredPermsField
-                    .toArray()
-                    .filter(p => !memberPermissions.has(p));
+                const missingPerms = requiredPermsField.toArray().filter((p) => !memberPermissions.has(p));
 
                 await interaction.reply({
                     content: `コマンドの実行に必要な権限が不足しています。\n不足している権限: \`${missingPerms.join(', ')}\``,

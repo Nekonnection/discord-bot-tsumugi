@@ -1,12 +1,13 @@
-import { ChannelType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, InteractionContextType, MessageFlags } from 'discord.js';
-import { CommandInteraction } from '../../base/command_base';
-import { config } from '../../../utils/config';
-import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder';
+import { ChannelType, ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits } from 'discord.js';
+
+import { config } from '../../../utils/config.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { CommandInteraction } from '../../base/command_base.js';
 /**
  * followコマンド
  */
 class FollowCommand extends CommandInteraction {
-    readonly command = new CustomSlashCommandBuilder()
+    public command = new CustomSlashCommandBuilder()
         .setName('follow')
         .setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。')
         .setCategory('一般')
@@ -14,7 +15,7 @@ class FollowCommand extends CommandInteraction {
         .setDefaultBotPermissions(PermissionFlagsBits.ManageChannels)
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
-    async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply({
             flags: MessageFlags.Ephemeral
         });

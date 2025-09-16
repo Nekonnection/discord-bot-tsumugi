@@ -1,50 +1,55 @@
-import { logger } from '../utils/log';
-import { EventBase } from './base/event_base';
-import { client, commandHandler } from '..';
+import { ActivityType } from 'discord.js';
 
-export let totalGuilds = '情報取得中...';
-export let totalUsers = '情報取得中...';
-/**
- * クライアントが準備完了したときに実行されるイベント
- */
+import { client, commandHandler } from '../index.js';
+import { logger } from '../utils/log.js';
+import { EventBase } from './base/event_base.js';
+
 class ReadyEvent extends EventBase<'ready'> {
-    readonly eventName = 'ready' as const;
+    public eventName = 'ready' as const;
+    public static totalGuilds = '情報取得中...';
+    public static totalUsers = '情報取得中...';
+    private updateInterval = 15000;
 
-    listener = async () => {
+    public async listener(): Promise<void> {
         try {
-            this.setActivityInterval();
             await commandHandler.registerCommands();
-            logger.info(`起動完了: ${client.user?.tag}`);
+            this.updateStatsAndActivity();
+            this.startUpdateLoop();
+            logger.info(`起動完了: ${client.user?.tag ?? 'Unknown User'}`);
         } catch (error) {
             logger.error('onReady中にエラーが発生しました。', error);
         }
-    };
-
-    private async setActivityInterval() {
-        setInterval(async () => {
-            client.user?.setActivity({
-                name: `/help | Servers: ${totalGuilds} | Users: ${totalUsers} | ${client.ws.ping}ms`
-            });
-        }, 10000);
-
-        setInterval(async () => {
-            totalGuilds = await this.checkTotalGuilds();
-            totalUsers = await this.checkTotalUsers();
-            totalUsers;
-        }, 60000);
     }
 
-    public async checkTotalGuilds(): Promise<string> {
+    private startUpdateLoop(): void {
+        ((): void => {
+            try {
+                this.updateStatsAndActivity();
+            } catch (error) {
+                logger.error('ステータスの定期更新中にエラーが発生しました。', error);
+            } finally {
+                setTimeout(() => {
+                    this.startUpdateLoop();
+                }, this.updateInterval);
+            }
+        })();
+    }
+
+    private updateStatsAndActivity(): void {
+        ReadyEvent.totalGuilds = this.checkTotalGuilds();
+        ReadyEvent.totalUsers = this.checkTotalUsers();
+
+        const name = `/help | Servers: ${ReadyEvent.totalGuilds} | Users: ${ReadyEvent.totalUsers}`;
+
+        client.user?.setActivity({ name, type: ActivityType.Playing });
+    }
+
+    public checkTotalGuilds(): string {
         return client.guilds.cache.size.toString();
     }
-    public async checkTotalUsers(): Promise<string> {
-        let totalMembers = 0;
 
-        for (const guild of client.guilds.cache.values()) {
-            await guild.members.fetch();
-            totalMembers += guild.memberCount;
-        }
-        return totalMembers.toString();
+    public checkTotalUsers(): string {
+        return client.guilds.cache.reduce((sum, guild) => sum + guild.memberCount, 0).toString();
     }
 }
 

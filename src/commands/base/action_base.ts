@@ -1,4 +1,5 @@
 import { Interaction, MappedComponentTypes, MappedInteractionTypes, ModalBuilder, ModalSubmitInteraction } from 'discord.js';
+
 import { InteractionBase } from './interaction_base.js';
 
 /**
@@ -9,7 +10,7 @@ abstract class ActionInteraction<MenuInteraction extends Interaction & { customI
      * コンストラクタ
      * @param _id アクションを識別するためのID
      */
-    constructor(private _id: string) {
+    protected constructor(private _id: string) {
         super();
     }
 
@@ -20,7 +21,6 @@ abstract class ActionInteraction<MenuInteraction extends Interaction & { customI
      */
     protected createCustomId(data?: Record<string, string>): string {
         const params = new URLSearchParams({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             _: this._id,
             ...data
         });
@@ -45,7 +45,7 @@ abstract class ActionInteraction<MenuInteraction extends Interaction & { customI
     protected abstract isType(interaction: Interaction): interaction is MenuInteraction;
 
     /** @inheritdoc */
-    override async onInteractionCreate(interaction: Interaction): Promise<void> {
+    public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         // 型が一致しない場合は無視
         if (!this.isType(interaction)) return;
 
@@ -61,7 +61,7 @@ abstract class ActionInteraction<MenuInteraction extends Interaction & { customI
      * @param interaction インタラクション
      * @param params カスタムIDのパラメータ
      */
-    abstract onCommand(interaction: MenuInteraction, params: URLSearchParams): Promise<void>;
+    protected abstract onCommand(interaction: MenuInteraction, params: URLSearchParams): Promise<void>;
 }
 
 /**
@@ -75,7 +75,7 @@ export abstract class MessageComponentActionInteraction<MenuComponentType extend
      * @param id アクションを識別するためのID
      * @param _type コンポーネントの種類
      */
-    constructor(
+    public constructor(
         id: string,
         private _type: MenuComponentType
     ) {
@@ -86,26 +86,25 @@ export abstract class MessageComponentActionInteraction<MenuComponentType extend
      * ビルダーの作成を行う
      * @returns 作成したビルダー
      */
-    abstract create(...args: unknown[]): Promise<MappedComponentTypes[MenuComponentType]>;
+    public abstract create(...args: unknown[]): Promise<MappedComponentTypes[MenuComponentType]>;
 
     /** @inheritdoc */
-    protected override createCustomId(data?: Record<string, string>): string {
+    public override createCustomId(data?: Record<string, string>): string {
         return super.createCustomId({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            _t: `${this._type}`,
+            _t: String(this._type),
             ...data
         });
     }
 
     /** @inheritdoc */
-    protected override isMyCustomId(params: URLSearchParams): boolean {
+    public override isMyCustomId(params: URLSearchParams): boolean {
         if (!super.isMyCustomId(params)) return false;
-        if (params.get('_t') !== `${this._type}`) return false;
+        if (params.get('_t') !== String(this._type)) return false;
         return true;
     }
 
     /** @inheritdoc */
-    protected override isType(interaction: Interaction): interaction is MappedInteractionTypes[MenuComponentType] {
+    public override isType(interaction: Interaction): interaction is MappedInteractionTypes[MenuComponentType] {
         return interaction.isMessageComponent() && interaction.componentType === this._type;
     }
 }
@@ -118,7 +117,7 @@ export abstract class ModalActionInteraction extends ActionInteraction<ModalSubm
      * コンストラクタ
      * @param id アクションを識別するためのID
      */
-    constructor(id: string) {
+    public constructor(id: string) {
         super(id);
     }
 
@@ -126,26 +125,25 @@ export abstract class ModalActionInteraction extends ActionInteraction<ModalSubm
      * ビルダーの作成を行う
      * @returns 作成したビルダー
      */
-    abstract create(...args: unknown[]): ModalBuilder;
+    public abstract create(...args: unknown[]): ModalBuilder;
 
     /** @inheritdoc */
-    protected override createCustomId(data?: Record<string, string>): string {
+    public override createCustomId(data?: Record<string, string>): string {
         return super.createCustomId({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             _t: 'm',
             ...data
         });
     }
 
     /** @inheritdoc */
-    protected override isMyCustomId(params: URLSearchParams): boolean {
+    public override isMyCustomId(params: URLSearchParams): boolean {
         if (!super.isMyCustomId(params)) return false;
         if (params.get('_t') !== 'm') return false;
         return true;
     }
 
     /** @inheritdoc */
-    protected override isType(interaction: Interaction): interaction is ModalSubmitInteraction {
+    public override isType(interaction: Interaction): interaction is ModalSubmitInteraction {
         return interaction.isModalSubmit();
     }
 }
