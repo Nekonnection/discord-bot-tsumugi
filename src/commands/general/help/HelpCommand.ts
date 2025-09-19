@@ -19,19 +19,11 @@ class HelpCommand extends AutocompleteCommandInteraction {
             option.setName('command_name').setDescription('指定したコマンドの詳細情報を表示します。').setAutocomplete(true)
         ) as CustomSlashCommandBuilder;
 
-    public constructor(
-        private readonly commandService: typeof CommandService,
-        private readonly helpEmbed: typeof HelpEmbed,
-        private readonly helpComponents: typeof HelpComponents
-    ) {
-        super();
-    }
-
     protected async onAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name !== 'command_name') return;
 
-        const choices = this.commandService.getCommandNames();
+        const choices = CommandService.getCommandNames();
         const filteredChoices = choices.filter((choice) => choice.startsWith(focusedOption.value));
         const response = filteredChoices.map((choice) => ({ name: choice, value: choice }));
 
@@ -43,19 +35,19 @@ class HelpCommand extends AutocompleteCommandInteraction {
 
         const commandName = interaction.options.getString('command_name');
         if (commandName) {
-            const commandInfo = this.commandService.findCommandName(commandName);
+            const commandInfo = CommandService.findCommandName(commandName);
             const embed = commandInfo
-                ? this.helpEmbed.createCommandInfoEmbed(interaction, commandInfo)
-                : this.helpEmbed.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
+                ? HelpEmbed.createCommandInfoEmbed(interaction, commandInfo)
+                : HelpEmbed.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
 
             await interaction.editReply({ embeds: [embed] });
         } else {
-            const categoryList = this.commandService.getCommandsCategory();
-            const embed = this.helpEmbed.createHomeEmbed(interaction, categoryList);
-            const components = await this.helpComponents.create();
+            const categoryList = CommandService.getCommandsCategory();
+            const embed = HelpEmbed.createHomeEmbed(interaction, categoryList);
+            const components = await HelpComponents.create();
 
             await interaction.editReply({ embeds: [embed], components: components });
         }
     }
 }
-export default new HelpCommand(CommandService, HelpEmbed, HelpComponents);
+export default new HelpCommand();
