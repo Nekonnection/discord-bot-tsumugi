@@ -9,7 +9,7 @@ import HelpEmbed from './HelpEmbed.js';
 /**
  * Helpコマンド
  */
-export class HelpCommand extends AutocompleteCommandInteraction {
+class HelpCommand extends AutocompleteCommandInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('help')
         .setDescription('Botのヘルプを表示します')
@@ -58,3 +58,4 @@ export class HelpCommand extends AutocompleteCommandInteraction {
         }
     }
 }
+export default new HelpCommand(CommandService, HelpEmbed, HelpComponents);
