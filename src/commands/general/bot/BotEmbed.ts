@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, EmbedBuilder, time, TimestampStyles } from 'discord.js';
 
+import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { BotInfo } from '../../../services/BotInfoService.js';
 import { config } from '../../../utils/config.js';
 
@@ -7,6 +8,7 @@ import { config } from '../../../utils/config.js';
  * Botコマンド関連のUIを生成するファクトリクラス
  */
 class BotEmbed {
+    private readonly embedFactory = new EmbedFactory();
     /**
      * Bot情報の埋め込みメッセージを作成する
      * @param interaction 元のインタラクション
@@ -14,9 +16,9 @@ class BotEmbed {
      * @returns 作成されたEmbedBuilder
      */
     public create(interaction: ChatInputCommandInteraction, botInfo: BotInfo): EmbedBuilder {
-        return new EmbedBuilder()
+        return this.embedFactory
+            .createBaseEmbed(interaction.user)
             .setAuthor({ name: `${botInfo.username}の情報`, iconURL: config.iconURL })
-            .setColor(Number(config.botColor))
             .setThumbnail(config.iconURL)
             .addFields(
                 { name: '名前', value: `${botInfo.username} (Tsumugi Byousaki)`, inline: false },
@@ -24,8 +26,7 @@ class BotEmbed {
                 { name: 'バージョン', value: botInfo.version, inline: true },
                 { name: '導入サーバー数', value: botInfo.guildCount, inline: true },
                 { name: '総ユーザー数', value: botInfo.userCount, inline: true }
-            )
-            .setFooter({ text: `実行者: ${interaction.user.displayName}`, iconURL: interaction.user.displayAvatarURL() });
+            );
     }
 }
 
