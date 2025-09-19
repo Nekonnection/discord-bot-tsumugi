@@ -2,8 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { CommandInteraction } from '../../base/command_base.js';
-// 作成したSlotEmbedをインポートします
-import SlotEmbed from './SlotEmbed.js'; // パスは実際のファイル位置に合わせてください
+import SlotEmbed from './SlotEmbed.js';
 
 const REELS = ['7️⃣', '🍒', '🍋', '🔔', '🍉', '⭐', '💎'];
 /**
@@ -15,7 +14,6 @@ class SlotCommand extends CommandInteraction {
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
 
-        // SlotEmbedを使って回転中のEmbedを生成
         const rotatingEmbed = SlotEmbed.createRotatingEmbed(interaction);
         await interaction.editReply({ embeds: [rotatingEmbed] });
 
@@ -27,12 +25,9 @@ class SlotCommand extends CommandInteraction {
             REELS[Math.floor(Math.random() * REELS.length)]
         ];
 
-        // SlotEmbedを使って結果のEmbedを生成
         const finalEmbed = SlotEmbed.createResultEmbed(interaction, results);
         await interaction.editReply({ embeds: [finalEmbed] });
     }
-
-    // Embed生成に関連するメソッドはSlotEmbedクラスに移動したため、不要になります。
 }
 
 export default new SlotCommand();
