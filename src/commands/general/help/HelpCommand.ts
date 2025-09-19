@@ -1,11 +1,10 @@
-import { ActionRowBuilder, AutocompleteInteraction, ChatInputCommandInteraction, StringSelectMenuBuilder } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 import CommandService from '../../../services/CommandService.js';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { AutocompleteCommandInteraction } from '../../base/command_base.js';
-import HelpCategoryMenuAction from './actions/HelpCategoryMenuAction.js';
-import HelpOperationMenuAction from './actions/HelpOperationMenuAction.js';
-import HelpEmbedFactory from './HelpEmbedFactory.js';
+import HelpComponents from './HelpComponents.js';
+import HelpEmbed from './HelpEmbed.js';
 
 /**
  * Helpコマンド
@@ -35,28 +34,20 @@ class HelpCommand extends AutocompleteCommandInteraction {
         await interaction.deferReply();
 
         const commandName = interaction.options.getString('command_name');
-
         if (commandName) {
             const commandInfo = CommandService.findCommandName(commandName);
             const embed = commandInfo
-                ? HelpEmbedFactory.createCommandInfoEmbed(interaction, commandInfo)
-                : HelpEmbedFactory.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
+                ? HelpEmbed.createCommandInfoEmbed(interaction, commandInfo)
+                : HelpEmbed.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
 
             await interaction.editReply({ embeds: [embed] });
         } else {
             const categoryList = CommandService.getCommandsCategory();
-            const embed = HelpEmbedFactory.createHomeEmbed(interaction, categoryList);
+            const embed = HelpEmbed.createHomeEmbed(interaction, categoryList);
+            const components = await HelpComponents.create();
 
-            const categoryMenu = await HelpCategoryMenuAction.create();
-            const operationMenu = await HelpOperationMenuAction.create();
-            const components = [
-                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(categoryMenu),
-                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(operationMenu)
-            ];
-
-            await interaction.editReply({ embeds: [embed], components });
+            await interaction.editReply({ embeds: [embed], components: components });
         }
     }
 }
-
 export default new HelpCommand();

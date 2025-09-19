@@ -6,7 +6,9 @@ import FixationOperation from '../operations/FixationOperation.js';
 import GuideOperation from '../operations/GuideOperation.js';
 import HomeOperation from '../operations/HomeOperation.js';
 import { IOperationStrategy } from '../operations/IOperationStrategy.js';
-
+/**
+ * ヘルプの操作メニューの作成と処理を行う
+ */
 class HelpOperationMenuAction extends MessageComponentActionInteraction<ComponentType.StringSelect> {
     private readonly operations: Map<string, IOperationStrategy>;
 

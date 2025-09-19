@@ -1,7 +1,7 @@
 import { StringSelectMenuInteraction } from 'discord.js';
 
 import CommandService from '../../../../services/CommandService.js';
-import HelpEmbedFactory from '../HelpEmbedFactory.js';
+import HelpEmbed from '../HelpEmbed.js';
 import { IOperationStrategy } from './IOperationStrategy.js';
 
 /**
@@ -10,7 +10,7 @@ import { IOperationStrategy } from './IOperationStrategy.js';
 class HomeOperation implements IOperationStrategy {
     public async execute(interaction: StringSelectMenuInteraction): Promise<void> {
         const commandsCategoryList = CommandService.getCommandsCategory();
-        const homeEmbed = HelpEmbedFactory.createHomeEmbed(interaction, commandsCategoryList);
+        const homeEmbed = HelpEmbed.createHomeEmbed(interaction, commandsCategoryList);
         await interaction.editReply({ embeds: [homeEmbed] });
     }
 }

@@ -2,8 +2,10 @@ import { ComponentType, StringSelectMenuBuilder, StringSelectMenuInteraction } f
 
 import CommandService from '../../../../services/CommandService.js';
 import { MessageComponentActionInteraction } from '../../../base/action_base.js';
-import HelpEmbedFactory from '../HelpEmbedFactory.js';
-
+import HelpEmbed from '../HelpEmbed.js';
+/**
+ * ヘルプのカテゴリーメニューの作成と処理を行う
+ */
 class HelpCategoryMenuAction extends MessageComponentActionInteraction<ComponentType.StringSelect> {
     public override create(): Promise<StringSelectMenuBuilder> {
         const customId = this.createCustomId();
@@ -26,13 +28,13 @@ class HelpCategoryMenuAction extends MessageComponentActionInteraction<Component
 
         if (!categoryData) {
             await interaction.update({
-                embeds: [HelpEmbedFactory.createErrorEmbed(interaction, '指定されたカテゴリが見つかりませんでした。')],
+                embeds: [HelpEmbed.createErrorEmbed(interaction, '指定されたカテゴリが見つかりませんでした。')],
                 components: []
             });
             return;
         }
 
-        const categoryEmbed = HelpEmbedFactory.createCategoryEmbed(interaction, categoryData);
+        const categoryEmbed = HelpEmbed.createCategoryEmbed(interaction, categoryData);
         await interaction.update({ embeds: [categoryEmbed] });
     }
 }
