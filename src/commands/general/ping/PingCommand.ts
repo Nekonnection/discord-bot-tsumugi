@@ -1,8 +1,9 @@
-import { ChatInputCommandInteraction, EmbedBuilder, Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 
-import { config } from '../../../utils/config.js';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { CommandInteraction } from '../../base/command_base.js';
+import PingEmbed from './PingEmbed.js';
+
 /**
  * Pingコマンド
  */
@@ -11,47 +12,18 @@ class PingCommand extends CommandInteraction {
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
-        const pingEmbed = this.createEmbed(interaction, 'Pingを測定中...', false);
 
+        const pingingEmbed = PingEmbed.createPingingEmbed(interaction);
         await interaction.editReply({
-            embeds: [pingEmbed]
+            embeds: [pingingEmbed]
         });
 
         const message: Message = await interaction.fetchReply();
-        const updatedPingEmbed = this.createEmbed(interaction, 'Pingを測定しました', true, message);
 
+        const updatedPingEmbed = PingEmbed.createResultEmbed(interaction, message);
         await interaction.editReply({
             embeds: [updatedPingEmbed]
         });
-    }
-    /**
-     * 埋め込みメッセージを作成する関数
-     * @param interaction インタラクション
-     * @param title タイトル
-     * @param isUpdate アップデートかどうか
-     * @param message メッセージ
-     * @returns 埋め込みメッセージ
-     */
-    private createEmbed(interaction: ChatInputCommandInteraction, title: string, isUpdate: boolean, message?: Message): EmbedBuilder {
-        const embed = new EmbedBuilder()
-            .setTitle(title)
-            .setColor(Number(config.botColor))
-            .setFooter({ text: 'コマンド送信日時', iconURL: interaction.user.displayAvatarURL() || undefined });
-
-        if (isUpdate && message) {
-            embed.setFields(
-                {
-                    name: 'WebSocket Ping',
-                    value: `${String(interaction.client.ws.ping)}ms`
-                },
-                {
-                    name: 'APIレイテンシ',
-                    value: `${String(message.createdTimestamp - interaction.createdTimestamp)}ms`
-                }
-            );
-        }
-
-        return embed;
     }
 }
 
