@@ -1,7 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 import { config } from '../../../utils/config.js';
-
+/**
+ * Botコマンドのコンポーネントを作成する
+ */
 class BotComponents {
     /**
      * アクションボタンの行を作成する

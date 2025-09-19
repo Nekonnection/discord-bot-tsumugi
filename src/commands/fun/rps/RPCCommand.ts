@@ -12,7 +12,9 @@ const WINS_AGAINST: Record<Hand, Hand> = {
     scissors: 'paper',
     paper: 'rock'
 };
-
+/**
+ * じゃんけんコマンド
+ */
 class RPCCommand extends CommandInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('rpc')

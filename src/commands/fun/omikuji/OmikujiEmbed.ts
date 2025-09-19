@@ -4,7 +4,7 @@ import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { OmikujiResult } from '../../../services/OmikujiService.js';
 
 /**
- * おみくじコマンドのUIを生成するファクトリクラス
+ * おみくじコマンドの埋め込みメッセージを作成する
  */
 class OmikujiEmbed {
     private readonly embedFactory = new EmbedFactory();

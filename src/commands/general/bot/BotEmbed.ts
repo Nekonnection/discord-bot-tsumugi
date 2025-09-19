@@ -5,7 +5,7 @@ import { BotInfo } from '../../../services/BotInfoService.js';
 import { config } from '../../../utils/config.js';
 
 /**
- * Botコマンド関連のUIを生成するファクトリクラス
+ * Botコマンドの埋め込みメッセージを作成する
  */
 class BotEmbed {
     private readonly embedFactory = new EmbedFactory();
