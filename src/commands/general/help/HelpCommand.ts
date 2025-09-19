@@ -1,16 +1,15 @@
-import { ActionRowBuilder, AutocompleteInteraction, ChatInputCommandInteraction, StringSelectMenuBuilder } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 import CommandService from '../../../services/CommandService.js';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { AutocompleteCommandInteraction } from '../../base/command_base.js';
-import HelpCategoryMenuAction from './actions/HelpCategoryMenuAction.js';
-import HelpOperationMenuAction from './actions/HelpOperationMenuAction.js';
-import HelpEmbedFactory from './HelpEmbedFactory.js';
+import HelpComponents from './HelpComponents.js';
+import HelpEmbed from './HelpEmbed.js';
 
 /**
  * Helpコマンド
  */
-class HelpCommand extends AutocompleteCommandInteraction {
+export class HelpCommand extends AutocompleteCommandInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('help')
         .setDescription('Botのヘルプを表示します')
@@ -20,11 +19,19 @@ class HelpCommand extends AutocompleteCommandInteraction {
             option.setName('command_name').setDescription('指定したコマンドの詳細情報を表示します。').setAutocomplete(true)
         ) as CustomSlashCommandBuilder;
 
+    public constructor(
+        private readonly commandService: typeof CommandService,
+        private readonly helpEmbed: typeof HelpEmbed,
+        private readonly helpComponents: typeof HelpComponents
+    ) {
+        super();
+    }
+
     protected async onAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name !== 'command_name') return;
 
-        const choices = CommandService.getCommandNames();
+        const choices = this.commandService.getCommandNames();
         const filteredChoices = choices.filter((choice) => choice.startsWith(focusedOption.value));
         const response = filteredChoices.map((choice) => ({ name: choice, value: choice }));
 
@@ -35,28 +42,19 @@ class HelpCommand extends AutocompleteCommandInteraction {
         await interaction.deferReply();
 
         const commandName = interaction.options.getString('command_name');
-
         if (commandName) {
-            const commandInfo = CommandService.findCommandName(commandName);
+            const commandInfo = this.commandService.findCommandName(commandName);
             const embed = commandInfo
-                ? HelpEmbedFactory.createCommandInfoEmbed(interaction, commandInfo)
-                : HelpEmbedFactory.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
+                ? this.helpEmbed.createCommandInfoEmbed(interaction, commandInfo)
+                : this.helpEmbed.createErrorEmbed(interaction, `コマンド \`${commandName}\` は見つかりませんでした。`);
 
             await interaction.editReply({ embeds: [embed] });
         } else {
-            const categoryList = CommandService.getCommandsCategory();
-            const embed = HelpEmbedFactory.createHomeEmbed(interaction, categoryList);
+            const categoryList = this.commandService.getCommandsCategory();
+            const embed = this.helpEmbed.createHomeEmbed(interaction, categoryList);
+            const components = await this.helpComponents.create();
 
-            const categoryMenu = await HelpCategoryMenuAction.create();
-            const operationMenu = await HelpOperationMenuAction.create();
-            const components = [
-                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(categoryMenu),
-                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(operationMenu)
-            ];
-
-            await interaction.editReply({ embeds: [embed], components });
+            await interaction.editReply({ embeds: [embed], components: components });
         }
     }
 }
-
-export default new HelpCommand();
