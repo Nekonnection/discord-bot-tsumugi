@@ -1,9 +1,9 @@
-import { copyFileSync, existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
+import path from 'path';
 import { exit } from 'process';
 import { parse } from 'toml';
 
 import { logger } from './log.js';
-import { getWorkdirPath } from './workdir.js';
 
 /**
  * コンフィグファイルの構造
@@ -18,18 +18,22 @@ export interface Config {
     announcementChannelId: string;
     supportGuildURL: string;
 }
-
-// config.tomlが存在しない場合は、config.default.tomlをコピーする。
-if (!existsSync(getWorkdirPath('config.toml'))) {
-    copyFileSync(getWorkdirPath('config.default.toml'), getWorkdirPath('config.toml'));
-}
-
-// コンフィグファイルを読み込む
 export const config: Config = ((): Config => {
+    const env = process.env.NODE_ENV ?? 'development';
+    const configFileName = `${env}.toml`;
+
+    const absoluteConfigPath = path.resolve('config', configFileName);
+
     try {
-        return parse(readFileSync(getWorkdirPath('config.toml'), 'utf-8')) as Config;
+        logger.info(`コンフィグファイル(${absoluteConfigPath})を読み込みます...`);
+        const tomlContent = readFileSync(absoluteConfigPath, 'utf-8');
+        return parse(tomlContent) as unknown as Config;
     } catch (error) {
-        logger.error('コンフィグの読み込みに失敗しました', error);
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            logger.error(`コンフィグファイルが見つかりません: ${absoluteConfigPath}`);
+        } else {
+            logger.error(`コンフィグファイル(${absoluteConfigPath})の読み込みまたは解析に失敗しました。`, error);
+        }
         exit(1);
     }
 })();
