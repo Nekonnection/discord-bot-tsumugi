@@ -2,5 +2,7 @@ dist/
 node_modules/
 run/config.toml
 *.log
-*.env
+*.env.*
 .vscode/
+development.toml
+production.toml
