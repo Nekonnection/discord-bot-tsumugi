@@ -15,14 +15,7 @@ export interface CategorizedCommands {
  * コマンド情報を一元管理するサービスクラス
  */
 class CommandService {
-    private static instance: CommandService = new CommandService();
     private commands: CommandInteraction[] = [];
-    /**
-     * シングルトンインスタンスを取得する
-     */
-    public static getInstance(): CommandService {
-        return CommandService.instance;
-    }
     /**
      * commandHandlerを受け取ってサービスを初期化するメソッドを新しく作る
      * @param commandHandler CommandHandlerのインスタンス
@@ -77,4 +70,4 @@ class CommandService {
     }
 }
 
-export default CommandService.getInstance();
+export default new CommandService();

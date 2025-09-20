@@ -15,12 +15,6 @@ export interface BotInfo {
  * Botの情報を一元管理するサービスクラス
  */
 class BotInfoService {
-    private static instance: BotInfoService = new BotInfoService();
-
-    public static getInstance(): BotInfoService {
-        return BotInfoService.instance;
-    }
-
     /**
      * Botに関する情報をまとめて取得する
      * @returns Bot情報のオブジェクト
@@ -36,4 +30,4 @@ class BotInfoService {
     }
 }
 
-export default BotInfoService.getInstance();
+export default new BotInfoService();
