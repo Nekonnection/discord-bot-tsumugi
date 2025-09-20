@@ -9,11 +9,18 @@ import { InteractionBase } from './base/interaction_base.js';
  * コマンドハンドラー
  */
 export default class CommandHandler {
+    private readonly commandsMap = new Map<string, InteractionBase>();
     /**
      * コマンドハンドラーを初期化します
      * @param _commands コマンドリスト
      */
-    public constructor(public _commands: InteractionBase[]) {}
+    public constructor(public _commands: InteractionBase[]) {
+        const commandsWithNames = _commands.filter(
+            (command): command is InteractionBase & { command: { name: string } } => command.command?.name !== undefined
+        );
+
+        this.commandsMap = new Map(commandsWithNames.map((command) => [command.command.name, command]));
+    }
 
     /**
      * コマンドを登録します
@@ -43,9 +50,16 @@ export default class CommandHandler {
      * @param interaction インタラクション
      */
     public async onInteractionCreate(interaction: Interaction): Promise<void> {
+        if (!interaction.isChatInputCommand() && !interaction.isAutocomplete()) return;
+
+        const command = this.commandsMap.get(interaction.commandName);
+
+        if (!command) {
+            logger.warn(`コマンドが見つかりません: ${interaction.commandName}`);
+            return;
+        }
         try {
-            // すべてのコマンドを処理
-            await Promise.all(this._commands.map((command) => command.onInteractionCreate(interaction)));
+            await command.onInteractionCreate(interaction);
         } catch (error) {
             logger.error('onInteractionCreate中にエラーが発生しました。', error);
         }

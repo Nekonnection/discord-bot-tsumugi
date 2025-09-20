@@ -18,7 +18,7 @@ WORKDIR /app
 COPY . .
 RUN npx prisma generate
 
-CMD ["npm", "run", "dev"]
+CMD ["sleep", "infinity"]
 
 FROM dependencies AS production
 
