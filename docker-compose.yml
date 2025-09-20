@@ -1,0 +1,77 @@
+services:
+  development:
+    restart: always
+    build:
+      context: .
+      target: development
+    container_name: discord-bot-tsumugi-dev
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=development
+      - TZ=Asia/Tokyo
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+      - type: bind
+        source: ./prisma
+        target: /app/prisma
+      - type: bind
+        source: ./config
+        target: /app/config
+      - type: bind
+        source: ./logs
+        target: /app/logs
+    ports:
+      - "5555:5555"
+    depends_on:
+      - mysql
+    networks:
+      - discord-bot-network
+
+  production:
+    restart: always
+    build:
+      context: .
+      target: production
+    container_name: discord-bot-tsumugi-prod
+    env_file:
+      - .env.prod
+    environment:
+      - NODE_ENV=production
+      - TZ=Asia/Tokyo
+    volumes:
+      - type: bind
+        source: ./logs
+        target: /app/logs
+    ports:
+      - "5555:5555"
+    depends_on:
+      - mysql
+    networks:
+      - discord-bot-network
+
+  mysql:
+    image: mysql:8.4
+    container_name: discord-bot-tsumugi-mysql
+    restart: always
+    env_file:
+      - .env.mysql
+    environment:
+      - TZ=Asia/Tokyo
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - discord-bot-network
+
+networks:
+  discord-bot-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

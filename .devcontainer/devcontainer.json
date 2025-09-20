@@ -1,0 +1,26 @@
+{
+    "name": "Tsumugi Bot Development",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "development",
+    "runServices": ["development"],
+    "workspaceFolder": "/app",
+    "shutdownAction": "stopCompose",
+    "postCreateCommand": "npm install",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {
+        "ppa": false
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "naumovs.color-highlight",
+                "dbaeumer.vscode-eslint",
+                "mhutchie.git-graph",
+                "donjayamanne.githistory",
+                "eamodio.gitlens",
+                "oderwat.indent-rainbow"
+            ]
+        }
+    }
+}
