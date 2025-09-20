@@ -1,9 +1,7 @@
-import { ClientEvents } from 'discord.js';
-
-import { EventBase } from './base/event_base.js';
 import interactionCreateEvent from './interactionCreate.js';
+import messageCreate from './messageCreate.js';
 import readyEvent from './ready.js';
 
-const events: EventBase<keyof ClientEvents>[] = [readyEvent, interactionCreateEvent];
+const events = [readyEvent, interactionCreateEvent, messageCreate];
 
 export default events;
