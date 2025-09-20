@@ -50,7 +50,7 @@ export default class CommandHandler {
      * @param interaction インタラクション
      */
     public async onInteractionCreate(interaction: Interaction): Promise<void> {
-        if (!interaction.isChatInputCommand()) return;
+        if (!interaction.isChatInputCommand() && !interaction.isAutocomplete()) return;
 
         const command = this.commandsMap.get(interaction.commandName);
 
