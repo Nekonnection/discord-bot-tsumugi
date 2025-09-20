@@ -7,3 +7,18 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Guild {
+  id        String    @id
+  keywords  Keyword[]
+}
+
+model Keyword {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  trigger   String
+  responses Json
+  guild     Guild    @relation(fields: [guildId], references: [id])
+
+  @@unique([guildId, trigger])
+}

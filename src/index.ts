@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import dotenv from 'dotenv';
 
@@ -7,6 +8,7 @@ import EventHandler from './events/EventHandler.js';
 import events from './events/events.js';
 import CommandService from './services/CommandService.js';
 
+export const prisma = new PrismaClient();
 /**
  * .envファイルを読み込む
  */

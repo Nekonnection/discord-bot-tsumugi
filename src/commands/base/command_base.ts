@@ -62,7 +62,7 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
 
     /** @inheritdoc */
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
-        return interaction.options.getSubcommandGroup() === this.command.name && this._registry.isMyInteraction(interaction);
+        return this._registry.isMyInteraction(interaction) && interaction.options.getSubcommandGroup(false) === this.command.name;
     }
 }
 /**
@@ -120,7 +120,7 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
 
     /** @inheritdoc */
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
-        return interaction.options.getSubcommand() === this.command.name && this._registry.isMyInteraction(interaction);
+        return this._registry.isMyInteraction(interaction) && interaction.options.getSubcommand(false) === this.command.name;
     }
 
     /** @inheritdoc */
