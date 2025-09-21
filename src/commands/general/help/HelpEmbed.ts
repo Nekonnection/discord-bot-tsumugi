@@ -4,7 +4,7 @@ import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { CategorizedCommands } from '../../../services/CommandService.js';
 import { config } from '../../../utils/config.js';
 import { translatePermission } from '../../../utils/permissionTranslator.js';
-import { CommandInteraction } from '../../base/command_base.js';
+import { CommandInteraction, SubCommandInteraction } from '../../base/command_base.js';
 
 type HelpInteraction = ChatInputCommandInteraction | StringSelectMenuInteraction;
 
@@ -33,24 +33,20 @@ export class HelpEmbed {
             );
     }
 
-    public createCommandInfoEmbed(interaction: ChatInputCommandInteraction, commandInfo: CommandInteraction): EmbedBuilder {
+    public createCommandInfoEmbed(interaction: ChatInputCommandInteraction, commandInfo: CommandInteraction | SubCommandInteraction): EmbedBuilder {
         const {
             name,
             description = '説明がありません',
             category = '未分類',
             usage = '使用方法が設定されていません',
-            default_member_permissions: defaultMemberPermissions,
             defaultBotPermissions
         } = commandInfo.command;
 
-        const memberPerms = BigInt(defaultMemberPermissions ?? 0);
         const botPerms = BigInt(defaultBotPermissions ?? 0);
 
-        const memberHasPermissions = interaction.memberPermissions?.has(memberPerms) ?? false;
         const botHasPermissions = interaction.guild?.members.me?.permissions.has(botPerms) ?? false;
 
-        const permissionStatus = memberHasPermissions && botHasPermissions ? 'はい' : 'いいえ';
-        const memberPermissionList = translatePermission(memberPerms).join('\n') || 'なし';
+        const permissionStatus = botHasPermissions ? 'はい' : 'いいえ';
         const botPermissionList = translatePermission(botPerms).join('\n') || 'なし';
 
         return this.embedFactory
@@ -61,7 +57,6 @@ export class HelpEmbed {
                 { name: 'カテゴリー', value: category },
                 { name: '使い方', value: usage },
                 { name: '実行可能か', value: permissionStatus, inline: true },
-                { name: 'ユーザーに必要な権限', value: memberPermissionList, inline: true },
                 { name: 'Botに必要な権限', value: botPermissionList, inline: true }
             );
     }

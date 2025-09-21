@@ -6,12 +6,12 @@ import {
     MessageFlags,
     PermissionResolvable,
     PermissionsBitField,
-    SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
     SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js';
+import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { InteractionBase } from './interaction_base.js';
 /**
  * コマンドベースのインタラクション
@@ -103,7 +103,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
  * サブコマンド
  */
 export abstract class SubCommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    public abstract command: SlashCommandSubcommandBuilder;
+    public abstract command: CustomSlashSubcommandBuilder;
 
     /**
      * コンストラクタ
@@ -111,6 +111,13 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
      */
     public constructor(private _registry: CommandGroupInteraction | SubcommandGroupInteraction) {
         super();
+    }
+
+    /**
+     * 親コマンド（グループ）を取得するゲッターを追加
+     */
+    public get registry(): CommandGroupInteraction | SubcommandGroupInteraction {
+        return this._registry;
     }
 
     /** @inheritdoc */
