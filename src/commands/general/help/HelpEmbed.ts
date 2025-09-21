@@ -3,11 +3,11 @@ import { ChatInputCommandInteraction, EmbedBuilder, StringSelectMenuInteraction 
 import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { CategorizedCommands } from '../../../services/CommandService.js';
 import { config } from '../../../utils/config.js';
-import { translatePermission } from '../../../utils/permissionTranslator.js';
+import { PermissionTranslator } from '../../../utils/permissionTranslator.js';
 import { CommandInteraction, SubCommandInteraction } from '../../base/command_base.js';
 
 type HelpInteraction = ChatInputCommandInteraction | StringSelectMenuInteraction;
-
+const translatePermission = (bitfield: bigint): string[] => new PermissionTranslator(bitfield).permissionNames;
 /**
  * ヘルプコマンドに関連するEmbedを生成するクラス
  */
@@ -42,11 +42,19 @@ export class HelpEmbed {
             defaultBotPermissions
         } = commandInfo.command;
 
-        const botPerms = BigInt(defaultBotPermissions ?? 0);
+        let defaultUserPermissions: string | number | bigint = 0;
 
+        if (commandInfo instanceof CommandInteraction && commandInfo.command.default_member_permissions) {
+            defaultUserPermissions = commandInfo.command.default_member_permissions;
+        }
+        const botPerms = BigInt(defaultBotPermissions ?? 0);
+        const memberPerms = BigInt(defaultUserPermissions);
+        console.log({ botPerms, memberPerms });
+        const memberHasPermissions = interaction.memberPermissions?.has(memberPerms) ?? false;
         const botHasPermissions = interaction.guild?.members.me?.permissions.has(botPerms) ?? false;
 
-        const permissionStatus = botHasPermissions ? 'はい' : 'いいえ';
+        const permissionStatus = memberHasPermissions && botHasPermissions ? 'はい' : 'いいえ';
+        const memberPermissionList = translatePermission(memberPerms).join('\n') || 'なし';
         const botPermissionList = translatePermission(botPerms).join('\n') || 'なし';
 
         return this.embedFactory
@@ -57,6 +65,7 @@ export class HelpEmbed {
                 { name: 'カテゴリー', value: category },
                 { name: '使い方', value: usage },
                 { name: '実行可能か', value: permissionStatus, inline: true },
+                { name: 'ユーザーに必要な権限', value: memberPermissionList, inline: true },
                 { name: 'Botに必要な権限', value: botPermissionList, inline: true }
             );
     }
