@@ -14,7 +14,10 @@ class KeywordRemoveCommand extends SubCommandInteraction {
         .setName('remove')
         .setDescription('登録されているキーワードを削除します。')
         .setCategory('キーワード応答機能')
-        .setUsage('`/keyword remove <キーワード>`');
+        .setUsage('`/keyword remove <キーワード>`')
+        .addStringOption((option) =>
+            option.setName('keyword').setDescription('削除するキーワードを指定します。').setRequired(true)
+        ) as CustomSlashSubcommandBuilder;
 
     public constructor() {
         super(keywordCommandGroup);
