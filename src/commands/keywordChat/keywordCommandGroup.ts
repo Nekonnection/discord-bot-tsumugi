@@ -8,7 +8,7 @@ class KeywordCommandGroup extends CommandGroupInteraction {
         .setName('keyword')
         .setDescription('キーワード応答機能に関する設定を行います')
         .setCategory('キーワード応答機能')
-        .setUsage('`/keyword [操作] <キーワード>`')
+        .setUsage('`/keyword [操作] <キーワード()>`')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild);
 }
 

@@ -1,12 +1,17 @@
-import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { prisma } from '../../index.js';
+import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { SubCommandInteraction } from '../base/command_base.js';
 import keywordCommandGroup from './keywordCommandGroup.js';
 import keywordEmbed from './keywordEmbed.js';
 
 class KeywordListCommand extends SubCommandInteraction {
-    public command = new SlashCommandSubcommandBuilder().setName('list').setDescription('登録されているキーワードの一覧を表示します。');
+    public command = new CustomSlashSubcommandBuilder()
+        .setName('list')
+        .setDescription('登録されているキーワードの一覧を表示します。')
+        .setCategory('キーワード応答機能')
+        .setUsage('`/keyword list`');
 
     public constructor() {
         super(keywordCommandGroup);

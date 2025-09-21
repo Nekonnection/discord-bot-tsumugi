@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { prisma } from '../../../index.js';
+import { logger } from '../../../utils/log.js';
 import { ModalActionInteraction } from '../../base/action_base.js';
 
 class KeywordAddModal extends ModalActionInteraction {
@@ -80,9 +81,9 @@ class KeywordAddModal extends ModalActionInteraction {
                 ephemeral: true
             });
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             await interaction.reply({
-                content: 'キーワードの登録中にエラーが発生しました。同じキーワードが既に登録されている可能性があります。',
+                content: 'キーワードの登録中にエラーが発生しました。',
                 ephemeral: true
             });
         }
