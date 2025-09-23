@@ -3,11 +3,12 @@ import { ChatInputCommandInteraction, EmbedBuilder, StringSelectMenuInteraction 
 import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { CategorizedCommands } from '../../../services/CommandService.js';
 import { config } from '../../../utils/config.js';
-import { translatePermission } from '../../../utils/permissionTranslator.js';
-import { CommandInteraction } from '../../base/command_base.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { PermissionTranslator } from '../../../utils/PermissionTranslator.js';
+import { CommandInteraction, SubCommandInteraction } from '../../base/command_base.js';
 
 type HelpInteraction = ChatInputCommandInteraction | StringSelectMenuInteraction;
-
+const translatePermission = (bitfield: bigint): string[] => new PermissionTranslator(bitfield).permissionNames;
 /**
  * ヘルプコマンドに関連するEmbedを生成するクラス
  */
@@ -33,19 +34,24 @@ export class HelpEmbed {
             );
     }
 
-    public createCommandInfoEmbed(interaction: ChatInputCommandInteraction, commandInfo: CommandInteraction): EmbedBuilder {
+    public createCommandInfoEmbed(interaction: ChatInputCommandInteraction, commandInfo: CommandInteraction | SubCommandInteraction): EmbedBuilder {
         const {
             name,
             description = '説明がありません',
             category = '未分類',
             usage = '使用方法が設定されていません',
-            default_member_permissions: defaultMemberPermissions,
             defaultBotPermissions
         } = commandInfo.command;
+        let defaultUserPermissions: string | number | bigint = 0;
 
-        const memberPerms = BigInt(defaultMemberPermissions ?? 0);
+        if (commandInfo instanceof CommandInteraction) {
+            defaultUserPermissions = commandInfo.command.default_member_permissions ?? 0;
+        } else if (commandInfo instanceof SubCommandInteraction) {
+            const registerCommand = commandInfo.registry.command as CustomSlashCommandBuilder;
+            defaultUserPermissions = registerCommand.default_member_permissions ?? 0;
+        }
         const botPerms = BigInt(defaultBotPermissions ?? 0);
-
+        const memberPerms = BigInt(defaultUserPermissions);
         const memberHasPermissions = interaction.memberPermissions?.has(memberPerms) ?? false;
         const botHasPermissions = interaction.guild?.members.me?.permissions.has(botPerms) ?? false;
 

@@ -6,12 +6,12 @@ import {
     MessageFlags,
     PermissionResolvable,
     PermissionsBitField,
-    SlashCommandSubcommandBuilder,
     SlashCommandSubcommandGroupBuilder,
     SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js';
+import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { InteractionBase } from './interaction_base.js';
 /**
  * コマンドベースのインタラクション
@@ -62,7 +62,7 @@ export abstract class SubcommandGroupInteraction extends InteractionBase impleme
 
     /** @inheritdoc */
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
-        return interaction.options.getSubcommandGroup() === this.command.name && this._registry.isMyInteraction(interaction);
+        return this._registry.isMyInteraction(interaction) && interaction.options.getSubcommandGroup(false) === this.command.name;
     }
 }
 /**
@@ -103,7 +103,8 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
  * サブコマンド
  */
 export abstract class SubCommandInteraction extends InteractionBase implements CommandBasedInteraction {
-    public abstract command: SlashCommandSubcommandBuilder;
+    public abstract command: CustomSlashSubcommandBuilder;
+    public parentCommand?: CommandGroupInteraction | SubcommandGroupInteraction;
 
     /**
      * コンストラクタ
@@ -113,6 +114,13 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
         super();
     }
 
+    /**
+     * 親コマンド（グループ）を取得するゲッターを追加
+     */
+    public get registry(): CommandGroupInteraction | SubcommandGroupInteraction {
+        return this._registry;
+    }
+
     /** @inheritdoc */
     public override registerSubCommands(): void {
         this._registry.command.addSubcommand(this.command);
@@ -120,7 +128,7 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
 
     /** @inheritdoc */
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
-        return interaction.options.getSubcommand() === this.command.name && this._registry.isMyInteraction(interaction);
+        return this._registry.isMyInteraction(interaction) && interaction.options.getSubcommand(false) === this.command.name;
     }
 
     /** @inheritdoc */

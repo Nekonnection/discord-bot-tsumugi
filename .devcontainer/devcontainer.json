@@ -19,7 +19,8 @@
                 "mhutchie.git-graph",
                 "donjayamanne.githistory",
                 "eamodio.gitlens",
-                "oderwat.indent-rainbow"
+                "oderwat.indent-rainbow",
+                "google.gemini-cli-vscode-ide-companion"
             ]
         }
     }

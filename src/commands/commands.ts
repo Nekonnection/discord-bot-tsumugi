@@ -8,6 +8,11 @@ import helpSelectMenuAction from './general/help/actions/HelpCategoryMenuAction.
 import helpOperationMenuAction from './general/help/actions/HelpOperationMenuAction.js';
 import helpCommand from './general/help/HelpCommand.js';
 import pingCommand from './general/ping/PingCommand.js';
+import keywordAddModal from './keywordChat/action/keywordAddModal.js';
+import keywordAddCommand from './keywordChat/keywordAddCommand.js';
+import keywordCommandGroup from './keywordChat/keywordCommandGroup.js';
+import keywordListCommand from './keywordChat/keywordListCommand.js';
+import keywordRemoveCommand from './keywordChat/keywordRemoveCommand.js';
 
 const commands: InteractionBase[] = [
     pingCommand,
@@ -18,7 +23,12 @@ const commands: InteractionBase[] = [
     omikujiCommand,
     followCommand,
     slotCommand,
-    rpsCommand
+    rpsCommand,
+    keywordAddCommand,
+    keywordAddModal,
+    keywordCommandGroup,
+    keywordRemoveCommand,
+    keywordListCommand
 ];
 
 export default commands;
