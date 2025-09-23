@@ -104,6 +104,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
  */
 export abstract class SubCommandInteraction extends InteractionBase implements CommandBasedInteraction {
     public abstract command: CustomSlashSubcommandBuilder;
+    public parentCommand?: CommandGroupInteraction | SubcommandGroupInteraction;
 
     /**
      * コンストラクタ

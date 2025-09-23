@@ -3,7 +3,8 @@ import { ChatInputCommandInteraction, EmbedBuilder, StringSelectMenuInteraction 
 import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { CategorizedCommands } from '../../../services/CommandService.js';
 import { config } from '../../../utils/config.js';
-import { PermissionTranslator } from '../../../utils/permissionTranslator.js';
+import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { PermissionTranslator } from '../../../utils/PermissionTranslator.js';
 import { CommandInteraction, SubCommandInteraction } from '../../base/command_base.js';
 
 type HelpInteraction = ChatInputCommandInteraction | StringSelectMenuInteraction;
@@ -41,15 +42,16 @@ export class HelpEmbed {
             usage = '使用方法が設定されていません',
             defaultBotPermissions
         } = commandInfo.command;
-
         let defaultUserPermissions: string | number | bigint = 0;
 
-        if (commandInfo instanceof CommandInteraction && commandInfo.command.default_member_permissions) {
-            defaultUserPermissions = commandInfo.command.default_member_permissions;
+        if (commandInfo instanceof CommandInteraction) {
+            defaultUserPermissions = commandInfo.command.default_member_permissions ?? 0;
+        } else if (commandInfo instanceof SubCommandInteraction) {
+            const registerCommand = commandInfo.registry.command as CustomSlashCommandBuilder;
+            defaultUserPermissions = registerCommand.default_member_permissions ?? 0;
         }
         const botPerms = BigInt(defaultBotPermissions ?? 0);
         const memberPerms = BigInt(defaultUserPermissions);
-        console.log({ botPerms, memberPerms });
         const memberHasPermissions = interaction.memberPermissions?.has(memberPerms) ?? false;
         const botHasPermissions = interaction.guild?.members.me?.permissions.has(botPerms) ?? false;
 
