@@ -23,10 +23,9 @@ class MessageCreateEvent extends EventBase<'messageCreate'> {
         try {
             const keywords = await prisma.keyword.findMany({
                 where: {
-                    guildId: message.guild?.id
+                    channelId: message.channel.id
                 }
             });
-
             for (const keyword of keywords) {
                 if (message.content.includes(keyword.trigger)) {
                     if (Array.isArray(keyword.responses) && keyword.responses.length > 0) {

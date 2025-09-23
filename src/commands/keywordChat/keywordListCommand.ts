@@ -28,7 +28,7 @@ class KeywordListCommand extends SubCommandInteraction {
 
         const prismaKeywords = await prisma.keyword.findMany({
             where: {
-                guildId: interaction.guild.id
+                channelId: interaction.channel?.id
             },
             orderBy: {
                 trigger: 'asc'
@@ -36,19 +36,19 @@ class KeywordListCommand extends SubCommandInteraction {
         });
 
         if (prismaKeywords.length === 0) {
-            await interaction.editReply('このサーバーにはキーワードが登録されていません。');
+            await interaction.editReply('このチャンネルにはキーワードが登録されていません。');
             return;
         }
 
         const keywords = prismaKeywords.map((k) => ({
             id: k.id,
-            guildId: k.guildId,
+            channelId: k.channelId,
             trigger: k.trigger,
             responses: Array.isArray(k.responses)
                 ? k.responses.filter((r): r is string => typeof r === 'string')
                 : typeof k.responses === 'string'
                   ? k.responses
-                  : ''
+                  : []
         }));
 
         const embeds = keywordEmbed.createKeywordListEmbeds(interaction.user, keywords);

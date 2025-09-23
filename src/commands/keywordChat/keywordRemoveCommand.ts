@@ -32,11 +32,16 @@ class KeywordRemoveCommand extends SubCommandInteraction {
         const trigger = interaction.options.getString('keyword', true);
 
         try {
+            const channelId = interaction.channel?.id;
+            if (!channelId) {
+                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', ephemeral: true });
+                return;
+            }
             await prisma.keyword.delete({
                 where: {
                     // eslint-disable-next-line @typescript-eslint/naming-convention
-                    guildId_trigger: {
-                        guildId: interaction.guild.id,
+                    channelId_trigger: {
+                        channelId: channelId,
                         trigger: trigger
                     }
                 }

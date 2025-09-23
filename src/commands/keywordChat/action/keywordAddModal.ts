@@ -36,7 +36,7 @@ class KeywordAddModal extends ModalActionInteraction {
     /** @inheritdoc */
     protected async onCommand(interaction: ModalSubmitInteraction): Promise<void> {
         if (!interaction.guild) {
-            await interaction.reply({ content: 'サーバー内でのみ実行できます。', ephemeral: true });
+            await interaction.reply({ content: 'サーバー内でのみ実行できます。' });
             return;
         }
 
@@ -47,22 +47,27 @@ class KeywordAddModal extends ModalActionInteraction {
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');
 
         if (responses.length === 0) {
-            await interaction.reply({ content: '応答メッセージを1つ以上入力してください。', ephemeral: true });
+            await interaction.reply({ content: '応答メッセージを1つ以上入力してください。' });
             return;
         }
 
         try {
             // データベースにキーワードを登録 (存在すれば更新、なければ作成)
-            await prisma.guild.upsert({
-                where: { id: interaction.guild.id },
+            const channelId = interaction.channel?.id;
+            if (!channelId) {
+                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。' });
+                return;
+            }
+            await prisma.channel.upsert({
+                where: { id: channelId },
                 update: {},
-                create: { id: interaction.guild.id }
+                create: { id: channelId }
             });
             await prisma.keyword.upsert({
                 where: {
                     // eslint-disable-next-line @typescript-eslint/naming-convention
-                    guildId_trigger: {
-                        guildId: interaction.guild.id,
+                    channelId_trigger: {
+                        channelId: channelId,
                         trigger: trigger
                     }
                 },
@@ -70,21 +75,19 @@ class KeywordAddModal extends ModalActionInteraction {
                     responses: responses
                 },
                 create: {
-                    guildId: interaction.guild.id,
+                    channelId: channelId,
                     trigger: trigger,
                     responses: responses
                 }
             });
 
             await interaction.reply({
-                content: `キーワード「${trigger}」を登録しました。`,
-                ephemeral: true
+                content: `キーワード「${trigger}」を登録しました。`
             });
         } catch (error) {
             logger.error(error);
             await interaction.reply({
-                content: 'キーワードの登録中にエラーが発生しました。',
-                ephemeral: true
+                content: 'キーワードの登録中にエラーが発生しました。'
             });
         }
     }

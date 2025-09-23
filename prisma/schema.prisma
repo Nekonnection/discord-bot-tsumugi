@@ -8,17 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Guild {
+model Channel {
   id        String    @id
   keywords  Keyword[]
 }
 
 model Keyword {
   id        Int      @id @default(autoincrement())
-  guildId   String
+  channelId   String
   trigger   String
   responses Json
-  guild     Guild    @relation(fields: [guildId], references: [id])
+  channel     Channel    @relation(fields: [channelId], references: [id])
 
-  @@unique([guildId, trigger])
+  @@unique([channelId, trigger])
 }
