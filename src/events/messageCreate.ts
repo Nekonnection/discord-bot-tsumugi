@@ -33,8 +33,8 @@ class MessageCreateEvent extends EventBase<'messageCreate'> {
                         const response = responses[Math.floor(Math.random() * responses.length)];
                         await (message.channel as TextChannel).send(response);
                     }
+                    return;
                 }
-                return;
             }
         } catch (error) {
             logger.error('キーワードの取得中にエラーが発生しました。', error);
