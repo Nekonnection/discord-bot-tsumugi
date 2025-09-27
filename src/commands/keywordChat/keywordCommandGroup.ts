@@ -7,7 +7,8 @@ class KeywordCommandGroup extends CommandGroupInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('keyword')
         .setDescription('キーワード応答機能に関する設定を行います')
-        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild);
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setCategory('キーワード応答機能');
 }
 
 export default new KeywordCommandGroup();
