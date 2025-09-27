@@ -1,6 +1,6 @@
 import { EmbedBuilder, User } from 'discord.js';
 
-import { config } from '../utils/config.js'; // パスは適宜修正してください
+import { config } from '../utils/config.js';
 
 /**
  * アプリケーション全体で共通のEmbedを生成するクラス
@@ -10,10 +10,7 @@ export class EmbedFactory {
      * エラーEmbedを作成する
      */
     public createErrorEmbed(user: User, message: string): EmbedBuilder {
-        return this.createBaseEmbed(user)
-            .setColor('Red') // エラーなので色を赤に
-            .setTitle('❌ エラー')
-            .setDescription(message);
+        return this.createBaseEmbed(user).setColor(Number(config.errorColor)).setTitle('❌ エラー').setDescription(message);
     }
 
     /**
