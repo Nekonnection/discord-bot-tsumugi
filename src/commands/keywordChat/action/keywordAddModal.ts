@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, MessageFlags, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { prisma } from '../../../index.js';
 import { logger } from '../../../utils/log.js';
@@ -14,6 +14,8 @@ class KeywordAddModal extends ModalActionInteraction {
             .setCustomId('trigger')
             .setLabel('キーワード')
             .setPlaceholder('例: こんにちは')
+            .setMinLength(1)
+            .setMaxLength(100)
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
@@ -21,6 +23,8 @@ class KeywordAddModal extends ModalActionInteraction {
             .setCustomId('responses')
             .setLabel('応答メッセージ (改行で複数指定)')
             .setPlaceholder('例:\nやあ！\nどうも！')
+            .setMinLength(1)
+            .setMaxLength(1000)
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(true);
 
@@ -42,32 +46,32 @@ class KeywordAddModal extends ModalActionInteraction {
 
         const trigger = interaction.fields.getTextInputValue('trigger');
         const responsesRaw = interaction.fields.getTextInputValue('responses');
-        if (responsesRaw.includes('@')) {
-            await interaction.reply({ content: '応答メッセージに`@`を含めることはできません。' });
-            return;
-        }
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');
 
-        const forbiddenPatterns = [/[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27}/i, /mfa\.[a-z0-9_-]{20,}/i];
-
-        const hasForbiddenPattern = responses.some((response) => forbiddenPatterns.some((pattern) => pattern.test(response)));
-
-        if (hasForbiddenPattern) {
+        const mentionPattern = /<@!?&?(\d{17,20})>/g;
+        if (responses.some((res) => mentionPattern.test(res) || res.includes('@everyone') || res.includes('@here'))) {
             await interaction.reply({
-                content: '応答メッセージに、機密情報（Discordトークンなど）と疑われる形式の文字列が含まれているため登録できません。'
+                content: '応答メッセージにメンションを含めることはできません。',
+                flags: MessageFlags.Ephemeral
             });
             return;
         }
 
-        if (responses.length === 0) {
-            await interaction.reply({ content: '応答メッセージを1つ以上入力してください。' });
+        const forbiddenPatterns = [/[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27}/i, /mfa\.[a-z0-9_-]{20,}/i];
+        const hasForbiddenPattern = responses.some((response) => forbiddenPatterns.some((pattern) => pattern.test(response)));
+
+        if (hasForbiddenPattern) {
+            await interaction.reply({
+                content: '応答メッセージに、機密情報と疑われる形式の文字列が含まれているため登録できません。',
+                flags: MessageFlags.Ephemeral
+            });
             return;
         }
 
         try {
             const channelId = interaction.channel?.id;
             if (!channelId) {
-                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。' });
+                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', flags: MessageFlags.Ephemeral });
                 return;
             }
             await prisma.channel.upsert({
@@ -94,12 +98,14 @@ class KeywordAddModal extends ModalActionInteraction {
             });
 
             await interaction.reply({
-                content: `キーワード「${trigger}」を登録しました。`
+                content: `キーワード「${trigger}」を登録しました。`,
+                flags: MessageFlags.Ephemeral
             });
         } catch (error) {
             logger.error(error);
             await interaction.reply({
-                content: 'キーワードの登録中にエラーが発生しました。'
+                content: 'キーワードの登録中にエラーが発生しました。',
+                flags: MessageFlags.Ephemeral
             });
         }
     }
