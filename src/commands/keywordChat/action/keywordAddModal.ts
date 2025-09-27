@@ -48,13 +48,23 @@ class KeywordAddModal extends ModalActionInteraction {
         }
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');
 
+        const forbiddenPatterns = [/[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27}/i, /mfa\.[a-z0-9_-]{20,}/i];
+
+        const hasForbiddenPattern = responses.some((response) => forbiddenPatterns.some((pattern) => pattern.test(response)));
+
+        if (hasForbiddenPattern) {
+            await interaction.reply({
+                content: '応答メッセージに、機密情報（Discordトークンなど）と疑われる形式の文字列が含まれているため登録できません。'
+            });
+            return;
+        }
+
         if (responses.length === 0) {
             await interaction.reply({ content: '応答メッセージを1つ以上入力してください。' });
             return;
         }
 
         try {
-            // データベースにキーワードを登録 (存在すれば更新、なければ作成)
             const channelId = interaction.channel?.id;
             if (!channelId) {
                 await interaction.reply({ content: 'チャンネル情報が取得できませんでした。' });
