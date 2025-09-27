@@ -7,7 +7,7 @@ import { InteractionBase } from './interaction_base.js';
  */
 export interface IActionInteraction {
     /**
-     * アクションを識別するためのユニークID
+     * アクションを識別するためのID
      */
     readonly id: string;
 
@@ -20,7 +20,17 @@ export interface IActionInteraction {
 /**
  * アクション
  */
-abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }> extends InteractionBase {
+export abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }>
+    extends InteractionBase
+    implements IActionInteraction
+{
+    /**
+     * アクションを識別するためのID
+     */
+    public get id(): string {
+        return this._id;
+    }
+
     /**
      * コンストラクタ
      * @param _id アクションを識別するためのID
