@@ -4,6 +4,8 @@ clientId = ""
 guildId = ""
 # Botのカラーコード
 botColor = ""
+# Botのエラーコード
+errorColor = ""
 # BotのアイコンURL
 iconURL = ""
 # Botの招待リンク
