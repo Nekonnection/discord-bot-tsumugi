@@ -5,7 +5,7 @@ import { InteractionBase } from './interaction_base.js';
 /**
  * アクション
  */
-abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }> extends InteractionBase {
+export abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }> extends InteractionBase {
     /**
      * コンストラクタ
      * @param _id アクションを識別するためのID
