@@ -42,8 +42,10 @@ class KeywordAddModal extends ModalActionInteraction {
 
         const trigger = interaction.fields.getTextInputValue('trigger');
         const responsesRaw = interaction.fields.getTextInputValue('responses');
-
-        // 改行で分割し、空行を除外して配列にする
+        if (responsesRaw.includes('@')) {
+            await interaction.reply({ content: '応答メッセージに`@`を含めることはできません。' });
+            return;
+        }
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');
 
         if (responses.length === 0) {
