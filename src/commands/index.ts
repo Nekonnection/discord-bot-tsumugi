@@ -9,6 +9,7 @@ import helpOperationMenuAction from './general/help/actions/HelpOperationMenuAct
 import helpCommand from './general/help/HelpCommand.js';
 import pingCommand from './general/ping/PingCommand.js';
 import keywordAddModal from './keywordChat/action/keywordAddModal.js';
+import KeywordListMenuAction from './keywordChat/action/KeywordListMenuAction.js';
 import keywordAddCommand from './keywordChat/keywordAddCommand.js';
 import keywordCommandGroup from './keywordChat/keywordCommandGroup.js';
 import keywordListCommand from './keywordChat/keywordListCommand.js';
@@ -28,7 +29,8 @@ const commands: InteractionBase[] = [
     keywordAddModal,
     keywordCommandGroup,
     keywordRemoveCommand,
-    keywordListCommand
+    keywordListCommand,
+    KeywordListMenuAction
 ];
 
 export default commands;
