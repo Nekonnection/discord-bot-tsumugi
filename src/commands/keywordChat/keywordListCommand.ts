@@ -28,9 +28,9 @@ class KeywordListCommand extends SubCommandInteraction {
         const triggerKeyword = interaction.options.getString('keyword');
 
         if (triggerKeyword) {
-            await this.handleShowResponses(interaction, triggerKeyword);
+            await this.showResponses(interaction, triggerKeyword);
         } else {
-            await this.handleShowList(interaction);
+            await this.showList(interaction);
         }
     }
 
@@ -38,7 +38,7 @@ class KeywordListCommand extends SubCommandInteraction {
      * 登録されているキーワードの一覧を表示します。
      * 複数ページになる場合はページネーションメニューを付けます。
      */
-    private async handleShowList(interaction: ChatInputCommandInteraction): Promise<void> {
+    private async showList(interaction: ChatInputCommandInteraction): Promise<void> {
         const channelId = interaction.channel?.id;
 
         const prismaKeywords = await prisma.keyword.findMany({
@@ -46,6 +46,10 @@ class KeywordListCommand extends SubCommandInteraction {
             orderBy: { trigger: 'asc' }
         });
 
+        if (prismaKeywords.length === 0) {
+            await interaction.editReply('このチャンネルには登録されているキーワードがありません。');
+            return;
+        }
         // ページ分割されたEmbedの配列を生成
         const typedKeywords = prismaKeywords.map((k) => ({
             ...k,
@@ -76,7 +80,7 @@ class KeywordListCommand extends SubCommandInteraction {
      * 指定されたキーワードの応答メッセージを表示します。
      * (このメソッドに変更はありません)
      */
-    private async handleShowResponses(interaction: ChatInputCommandInteraction, trigger: string): Promise<void> {
+    private async showResponses(interaction: ChatInputCommandInteraction, trigger: string): Promise<void> {
         const keyword = await prisma.keyword.findFirst({
             where: {
                 channelId: interaction.channel?.id,
