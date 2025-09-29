@@ -10,7 +10,7 @@ interface PrismaKeyword {
 
 class KeywordEmbed {
     private readonly embedFactory = new EmbedFactory();
-    private readonly maxDescriptionLength = 1000;
+    private readonly maxDescriptionLength = 2000;
     private readonly separator = ', ';
 
     /**

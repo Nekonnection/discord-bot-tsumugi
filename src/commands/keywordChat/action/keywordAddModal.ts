@@ -39,11 +39,6 @@ class KeywordAddModal extends ModalActionInteraction {
 
     /** @inheritdoc */
     protected async onCommand(interaction: ModalSubmitInteraction): Promise<void> {
-        if (!interaction.guild) {
-            await interaction.reply({ content: 'サーバー内でのみ実行できます。' });
-            return;
-        }
-
         const trigger = interaction.fields.getTextInputValue('trigger');
         const responsesRaw = interaction.fields.getTextInputValue('responses');
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');

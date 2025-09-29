@@ -1,4 +1,4 @@
-import { PermissionsBitField } from 'discord.js';
+import { InteractionContextType, PermissionsBitField } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js';
 import { CommandGroupInteraction } from '../base/command_base.js';
@@ -8,7 +8,8 @@ class KeywordCommandGroup extends CommandGroupInteraction {
         .setName('keyword')
         .setDescription('キーワード応答機能に関する設定を行います')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
-        .setCategory('キーワード応答機能');
+        .setCategory('キーワード応答機能')
+        .setContexts(InteractionContextType.Guild);
 }
 
 export default new KeywordCommandGroup();

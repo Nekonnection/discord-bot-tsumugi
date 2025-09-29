@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ChatInputCommandInteraction, MessageFlags, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder } from 'discord.js';
 
 import { prisma } from '../../index.js';
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
@@ -23,11 +23,6 @@ class KeywordListCommand extends SubCommandInteraction {
 
     /** @inheritdoc */
     public async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        if (!interaction.guild || !interaction.channel) {
-            await interaction.reply({ content: 'サーバー内のチャンネルでのみ実行できます。', flags: MessageFlags.Ephemeral });
-            return;
-        }
-
         await interaction.deferReply();
 
         const triggerKeyword = interaction.options.getString('keyword');

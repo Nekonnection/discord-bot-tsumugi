@@ -9,7 +9,6 @@ import keywordEmbed from '../keywordEmbed.js';
  */
 class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentType.StringSelect> {
     public constructor() {
-        // 一意のIDを設定
         super('keyword_list_page', ComponentType.StringSelect);
     }
 
@@ -35,15 +34,10 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
      * @param interaction - 受信したインタラクション
      */
     protected override async onCommand(interaction: StringSelectMenuInteraction): Promise<void> {
-        if (!interaction.guild || !interaction.channel) {
-            await interaction.reply({ content: 'サーバー内のチャンネルでのみ実行できます。', ephemeral: true });
-            return;
-        }
-
         const selectedPageIndex = parseInt(interaction.values[0], 10);
 
         const prismaKeywordsRaw = await prisma.keyword.findMany({
-            where: { channelId: interaction.channel.id },
+            where: { channelId: interaction.channel?.id },
             orderBy: { trigger: 'asc' }
         });
 

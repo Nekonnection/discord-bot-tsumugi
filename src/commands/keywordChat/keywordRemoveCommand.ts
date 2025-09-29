@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { prisma } from '../../index.js';
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
@@ -25,16 +25,12 @@ class KeywordRemoveCommand extends SubCommandInteraction {
 
     /** @inheritdoc */
     public async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        if (!interaction.guild) {
-            await interaction.reply({ content: 'サーバー内でのみ実行できます。', ephemeral: true });
-            return;
-        }
         const trigger = interaction.options.getString('keyword', true);
 
         try {
             const channelId = interaction.channel?.id;
             if (!channelId) {
-                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', ephemeral: true });
+                await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', flags: MessageFlags.Ephemeral });
                 return;
             }
             await prisma.keyword.delete({
@@ -46,9 +42,9 @@ class KeywordRemoveCommand extends SubCommandInteraction {
                     }
                 }
             });
-            await interaction.reply({ content: `キーワード「${trigger}」を削除しました。`, ephemeral: true });
+            await interaction.reply({ content: `キーワード「${trigger}」を削除しました。`, flags: MessageFlags.Ephemeral });
         } catch (error) {
-            await interaction.reply({ content: `キーワード「${trigger}」は見つかりませんでした。`, ephemeral: true });
+            await interaction.reply({ content: `キーワード「${trigger}」は見つかりませんでした。`, flags: MessageFlags.Ephemeral });
             logger.error('キーワード削除エラー: ', error);
         }
     }
