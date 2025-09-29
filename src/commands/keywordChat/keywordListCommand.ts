@@ -6,7 +6,9 @@ import { SubCommandInteraction } from '../base/command_base.js';
 import keywordListMenuAction from './action/KeywordListMenuAction.js';
 import keywordCommandGroup from './keywordCommandGroup.js';
 import keywordEmbed from './keywordEmbed.js';
-
+/**
+ * キーワード一覧表示コマンド
+ */
 class KeywordListCommand extends SubCommandInteraction {
     public command = new CustomSlashSubcommandBuilder()
         .setName('list')
@@ -35,8 +37,8 @@ class KeywordListCommand extends SubCommandInteraction {
     }
 
     /**
-     * 登録されているキーワードの一覧を表示します。
-     * 複数ページになる場合はページネーションメニューを付けます。
+     * 登録されているキーワードの一覧を表示する
+     * 複数ページになる場合はページネーションメニューを付ける
      */
     private async showList(interaction: ChatInputCommandInteraction): Promise<void> {
         const channelId = interaction.channel?.id;
@@ -78,7 +80,6 @@ class KeywordListCommand extends SubCommandInteraction {
 
     /**
      * 指定されたキーワードの応答メッセージを表示します。
-     * (このメソッドに変更はありません)
      */
     private async showResponses(interaction: ChatInputCommandInteraction, trigger: string): Promise<void> {
         const keyword = await prisma.keyword.findFirst({
