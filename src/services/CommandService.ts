@@ -1,5 +1,4 @@
 import { CommandGroupInteraction, CommandInteraction, SubCommandInteraction } from '../commands/base/command_base.js';
-import { InteractionBase } from '../commands/base/interaction_base.js';
 import CommandHandler from '../commands/CommandHandler.js';
 
 export interface CommandInfo {
@@ -22,19 +21,56 @@ export interface CommandHelpInfo {
 }
 
 class CommandService {
-    private interactions: InteractionBase[] = [];
-
-    private commands: (CommandInteraction | SubCommandInteraction)[] = [];
-
+    private categorizedCommands: CategorizedCommands[] = [];
+    private commandMap = new Map<string, CommandInteraction | SubCommandInteraction>();
+    private commandNames: string[] = [];
+    /**
+     * サービスを初期化し、コマンド情報を一度だけ計算してキャッシュします。
+     * @param commandHandler
+     */
     public initialize(commandHandler: CommandHandler): void {
-        this.interactions = commandHandler._commands;
-
-        this.commands = this.interactions.filter(
-            (c): c is CommandInteraction | SubCommandInteraction =>
-                (c instanceof CommandInteraction || c instanceof SubCommandInteraction) &&
-                'category' in c.command &&
-                typeof c.command.category === 'string'
+        const executableCommands = commandHandler.commands.filter(
+            (c): c is CommandInteraction | SubCommandInteraction => c instanceof CommandInteraction || c instanceof SubCommandInteraction
         );
+
+        const commandsCategoryMap: Record<string, CommandInfo[]> = {};
+
+        for (const cmd of executableCommands) {
+            const fullName = this.getCommandFullName(cmd);
+            let category: string | undefined = undefined;
+            if ('category' in cmd.command && typeof cmd.command.category === 'string') {
+                category = cmd.command.category;
+            } else if (cmd instanceof SubCommandInteraction) {
+                const parent = cmd.registry;
+                if (
+                    parent instanceof CommandGroupInteraction &&
+                    'command' in parent &&
+                    'category' in parent.command &&
+                    typeof parent.command.category === 'string'
+                ) {
+                    category = parent.command.category;
+                }
+            }
+
+            if (category) {
+                this.commandMap.set(fullName, cmd);
+
+                if (!this.commandNames.includes(fullName)) {
+                    this.commandNames.push(fullName);
+                }
+
+                commandsCategoryMap[category] ??= [];
+                commandsCategoryMap[category].push({
+                    name: fullName,
+                    description: cmd.command.description
+                });
+            }
+        }
+
+        this.categorizedCommands = Object.entries(commandsCategoryMap).map(([category, commands]) => ({
+            category,
+            commands
+        }));
     }
 
     /**
@@ -49,50 +85,25 @@ class CommandService {
         }
         return interaction.command.name;
     }
-
     /**
-     * 指定された名前のコマンド情報を取得する（フルネーム検索に対応）
-     * @param name コマンドのフルネーム
-     * @returns コマンド情報
+     * 指定された名前のコマンド情報をキャッシュから取得します
      */
     public findCommandName(name: string): CommandInteraction | SubCommandInteraction | undefined {
-        return this.commands.find((c) => this.getCommandFullName(c) === name);
+        return this.commandMap.get(name);
     }
 
     /**
-     * オートコンプリート用のコマンド名リストを取得する（フルネームを返すように修正）
-     * @returns コマンド名の配列
+     * コマンド名リストをキャッシュから取得します
      */
     public getCommandNames(): string[] {
-        return this.commands.map((c) => this.getCommandFullName(c));
+        return this.commandNames;
     }
 
     /**
-     * コマンドをカテゴリーごとに分類して取得する
-     * @returns カテゴリーごとのコマンドリスト
+     * コマンドをカテゴリーごとに分類したリストをキャッシュから取得します
      */
     public getCommandsCategory(): CategorizedCommands[] {
-        const commandsCategory: Record<string, CommandInfo[]> = {};
-
-        for (const cmd of this.commands) {
-            if ('category' in cmd.command && typeof cmd.command.category === 'string') {
-                const category = cmd.command.category;
-
-                if (!(category in commandsCategory)) {
-                    commandsCategory[category] = [];
-                }
-
-                commandsCategory[category].push({
-                    name: this.getCommandFullName(cmd), // ヘルパーメソッドを使用
-                    description: cmd.command.description
-                });
-            }
-        }
-
-        return Object.entries(commandsCategory).map(([category, commands]) => ({
-            category,
-            commands
-        }));
+        return this.categorizedCommands;
     }
 }
 

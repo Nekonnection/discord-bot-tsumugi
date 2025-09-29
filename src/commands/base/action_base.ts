@@ -3,9 +3,34 @@ import { Interaction, MappedComponentTypes, MappedInteractionTypes, ModalBuilder
 import { InteractionBase } from './interaction_base.js';
 
 /**
+ * すべてのActionInteractionが共通して持つ、ジェネリックに依存しないインターフェース
+ */
+export interface IActionInteraction {
+    /**
+     * アクションを識別するためのID
+     */
+    readonly id: string;
+
+    /**
+     * すべてのインタラクションを受け取るエントリーポイント
+     * @param interaction
+     */
+    onInteractionCreate(interaction: Interaction): Promise<void>;
+}
+/**
  * アクション
  */
-abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }> extends InteractionBase {
+export abstract class ActionInteraction<MenuInteraction extends Interaction & { customId: string }>
+    extends InteractionBase
+    implements IActionInteraction
+{
+    /**
+     * アクションを識別するためのID
+     */
+    public get id(): string {
+        return this._id;
+    }
+
     /**
      * コンストラクタ
      * @param _id アクションを識別するためのID

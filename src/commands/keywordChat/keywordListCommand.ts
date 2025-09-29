@@ -1,17 +1,21 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ActionRowBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder } from 'discord.js';
 
 import { prisma } from '../../index.js';
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { SubCommandInteraction } from '../base/command_base.js';
+import keywordListMenuAction from './action/KeywordListMenuAction.js';
 import keywordCommandGroup from './keywordCommandGroup.js';
 import keywordEmbed from './keywordEmbed.js';
 
 class KeywordListCommand extends SubCommandInteraction {
     public command = new CustomSlashSubcommandBuilder()
         .setName('list')
-        .setDescription('登録されているキーワードの一覧を表示します。')
+        .setDescription('登録されているキーワードの一覧、または指定したキーワードの応答を表示します。')
         .setCategory('キーワード応答機能')
-        .setUsage('`/keyword list`');
+        .setUsage('`/keyword list`\n`/keyword list keyword: <キーワード名>`')
+        .addStringOption((option) =>
+            option.setName('keyword').setDescription('応答を表示するキーワードを指定します。').setRequired(false)
+        ) as CustomSlashSubcommandBuilder;
 
     public constructor() {
         super(keywordCommandGroup);
@@ -19,50 +23,86 @@ class KeywordListCommand extends SubCommandInteraction {
 
     /** @inheritdoc */
     public async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        if (!interaction.guild) {
-            await interaction.reply({ content: 'サーバー内でのみ実行できます。' });
-            return;
-        }
-
         await interaction.deferReply();
 
+        const triggerKeyword = interaction.options.getString('keyword');
+
+        if (triggerKeyword) {
+            await this.showResponses(interaction, triggerKeyword);
+        } else {
+            await this.showList(interaction);
+        }
+    }
+
+    /**
+     * 登録されているキーワードの一覧を表示します。
+     * 複数ページになる場合はページネーションメニューを付けます。
+     */
+    private async showList(interaction: ChatInputCommandInteraction): Promise<void> {
+        const channelId = interaction.channel?.id;
+
         const prismaKeywords = await prisma.keyword.findMany({
-            where: {
-                channelId: interaction.channel?.id
-            },
-            orderBy: {
-                trigger: 'asc'
-            }
+            where: { channelId: channelId },
+            orderBy: { trigger: 'asc' }
         });
 
         if (prismaKeywords.length === 0) {
-            await interaction.editReply('このチャンネルにはキーワードが登録されていません。');
+            await interaction.editReply('このチャンネルには登録されているキーワードがありません。');
             return;
         }
-
-        const keywords = prismaKeywords.map((k) => ({
-            id: k.id,
-            channelId: k.channelId,
-            trigger: k.trigger,
+        // ページ分割されたEmbedの配列を生成
+        const typedKeywords = prismaKeywords.map((k) => ({
+            ...k,
             responses: Array.isArray(k.responses)
                 ? k.responses.filter((r): r is string => typeof r === 'string')
                 : typeof k.responses === 'string'
-                  ? k.responses
+                  ? [k.responses]
                   : []
         }));
+        const embeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, typedKeywords);
+        const firstEmbed = embeds[0];
 
-        const embeds = keywordEmbed.createKeywordListEmbeds(interaction.user, keywords);
-
-        const firstEmbed = embeds.shift();
-        if (firstEmbed) {
-            await interaction.editReply({
-                embeds: [firstEmbed]
-            });
+        if (embeds.length <= 1) {
+            await interaction.editReply({ embeds: [firstEmbed], components: [] });
+            return;
         }
 
-        for (const embed of embeds) {
-            await interaction.followUp({ embeds: [embed], ephemeral: true });
+        const menu = await keywordListMenuAction.create(embeds.length);
+        const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+
+        await interaction.editReply({
+            embeds: [firstEmbed],
+            components: [row]
+        });
+    }
+
+    /**
+     * 指定されたキーワードの応答メッセージを表示します。
+     * (このメソッドに変更はありません)
+     */
+    private async showResponses(interaction: ChatInputCommandInteraction, trigger: string): Promise<void> {
+        const keyword = await prisma.keyword.findFirst({
+            where: {
+                channelId: interaction.channel?.id,
+                trigger: trigger
+            }
+        });
+
+        if (!keyword) {
+            await interaction.editReply(`キーワード「${trigger}」は見つかりませんでした。`);
+            return;
         }
+
+        const typedKeyword = {
+            ...keyword,
+            responses: Array.isArray(keyword.responses)
+                ? keyword.responses.filter((r): r is string => typeof r === 'string')
+                : typeof keyword.responses === 'string'
+                  ? [keyword.responses]
+                  : []
+        };
+        const embed = keywordEmbed.createKeywordResponsesEmbed(interaction.user, typedKeyword);
+        await interaction.editReply({ embeds: [embed] });
     }
 }
 

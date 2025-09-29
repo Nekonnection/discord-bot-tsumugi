@@ -1,3 +1,4 @@
+// src/commands/keyword/keywordEmbed.ts
 import { EmbedBuilder, User } from 'discord.js';
 
 import { EmbedFactory } from '../../factories/EmbedFactory.js';
@@ -8,43 +9,76 @@ interface PrismaKeyword {
 }
 
 class KeywordEmbed {
-    private embedFactory = new EmbedFactory();
-    private readonly maxDescriptionLength = 4096;
+    private readonly embedFactory = new EmbedFactory();
+    private readonly maxDescriptionLength = 2000;
+    private readonly separator = ', ';
 
     /**
-     * キーワードリストからEmbedの配列を生成します。
+     * キーワードリストからページ分割されたEmbedの配列を生成します。
      * 文字数制限を超えた場合は、自動的に複数のEmbedに分割します。
      * @param user - Embedのフッターに表示するユーザー
      * @param keywords - 表示するキーワードの配列
      * @returns 生成されたEmbedBuilderの配列
      */
-    public createKeywordListEmbeds(user: User, keywords: PrismaKeyword[]): EmbedBuilder[] {
+    public createPaginatedTriggerListEmbeds(user: User, keywords: PrismaKeyword[]): EmbedBuilder[] {
         if (keywords.length === 0) {
             return [this.embedFactory.createBaseEmbed(user).setDescription('このサーバーにはキーワードが登録されていません。')];
         }
 
         const embeds: EmbedBuilder[] = [];
-        let description = '';
+        let currentDescription = '';
 
         for (const keyword of keywords) {
-            const responsesText = Array.isArray(keyword.responses) ? keyword.responses.join(', ') : keyword.responses;
+            const triggerText = `\`${keyword.trigger}\``;
 
-            const fieldText = `**${keyword.trigger}** -> ${responsesText}\n`;
-
-            if (description.length + fieldText.length > this.maxDescriptionLength) {
-                const embed = this.embedFactory.createBaseEmbed(user).setTitle('キーワード一覧').setDescription(description);
-                embeds.push(embed);
-                description = fieldText;
+            if (currentDescription.length + triggerText.length + this.separator.length > this.maxDescriptionLength) {
+                embeds.push(this.createBaseListEmbed(user, currentDescription));
+                currentDescription = triggerText;
             } else {
-                description += fieldText;
+                if (currentDescription.length > 0) {
+                    currentDescription += this.separator;
+                }
+                currentDescription += triggerText;
             }
         }
-        if (description.length > 0) {
-            const embed = this.embedFactory.createBaseEmbed(user).setTitle('キーワード一覧').setDescription(description);
-            embeds.push(embed);
+
+        if (currentDescription.length > 0) {
+            embeds.push(this.createBaseListEmbed(user, currentDescription));
         }
 
+        embeds.forEach((embed, index) => {
+            embed.setTitle(`キーワード一覧 (${String(index + 1)} / ${String(embeds.length)})`);
+        });
+
         return embeds;
+    }
+
+    /**
+     * 指定されたキーワードの応答メッセージ一覧Embedを生成します。
+     * @param user - Embedのフッターに表示するユーザー
+     * @param keyword - 表示するキーワードオブジェクト
+     * @returns 生成されたEmbedBuilder
+     */
+    public createKeywordResponsesEmbed(user: User, keyword: PrismaKeyword): EmbedBuilder {
+        const responses = Array.isArray(keyword.responses) ? keyword.responses : [keyword.responses];
+        const description = responses.map((res) => `- ${res}`).join('\n');
+
+        const embed = this.embedFactory.createBaseEmbed(user).setTitle(`キーワード「${keyword.trigger}」の応答一覧`).setDescription(description);
+
+        return embed;
+    }
+
+    /**
+     * キーワード一覧のEmbedの基礎部分を生成するヘルパーメソッド
+     * @param user - Embedのフッターに表示するユーザー
+     * @param description - Embedに設定する説明文
+     * @returns 生成されたEmbedBuilder
+     */
+    private createBaseListEmbed(user: User, description: string): EmbedBuilder {
+        return this.embedFactory.createBaseEmbed(user).setDescription(description).setFields({
+            name: 'キーワードの応答確認方法',
+            value: '各キーワードの応答を確認するには `/keyword list keyword: <キーワード>` を使用してください。'
+        });
     }
 }
 
