@@ -43,7 +43,7 @@ class KeywordAddModal extends ModalActionInteraction {
         const responsesRaw = interaction.fields.getTextInputValue('responses');
         const responses = responsesRaw.split('\n').filter((line) => line.trim() !== '');
 
-        const mentionPattern = /<@!?&?(\d{17,20})>/g;
+        const mentionPattern = /<@!?&?(\d{17,20})>/i;
         if (responses.some((res) => mentionPattern.test(res) || res.includes('@everyone') || res.includes('@here'))) {
             await interaction.reply({
                 content: '応答メッセージにメンションを含めることはできません。',
