@@ -4,8 +4,8 @@ import { client, commandHandler } from '../index.js';
 import { logger } from '../utils/log.js';
 import { EventBase } from './base/event_base.js';
 
-class ReadyEvent extends EventBase<'ready'> {
-    public eventName = 'ready' as const;
+class ReadyEvent extends EventBase<'clientReady'> {
+    public eventName = 'clientReady' as const;
     public static totalGuilds = '情報取得中...';
     public static totalUsers = '情報取得中...';
     private updateInterval = 15000;
