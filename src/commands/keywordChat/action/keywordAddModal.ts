@@ -4,6 +4,9 @@ import { prisma } from '../../../index.js';
 import { logger } from '../../../utils/log.js';
 import { ModalActionInteraction } from '../../base/action_base.js';
 
+/**
+ * キーワードを登録するモーダル
+ */
 class KeywordAddModal extends ModalActionInteraction {
     public constructor() {
         super('keyword_add_modal');
