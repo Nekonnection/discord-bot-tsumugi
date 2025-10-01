@@ -1,4 +1,4 @@
-import { ComponentType, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
+import { ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 import { prisma } from '../../../index.js';
 import { MessageComponentActionInteraction } from '../../base/action_base.js';
@@ -35,9 +35,14 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
      */
     protected override async onCommand(interaction: StringSelectMenuInteraction): Promise<void> {
         const selectedPageIndex = parseInt(interaction.values[0], 10);
+        const channelId = interaction.channel?.id;
+        if (!channelId) {
+            await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', flags: MessageFlags.Ephemeral });
+            return;
+        }
 
         const prismaKeywordsRaw = await prisma.keyword.findMany({
-            where: { channelId: interaction.channel?.id },
+            where: { channelId: channelId },
             orderBy: { trigger: 'asc' }
         });
 
