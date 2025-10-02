@@ -17,6 +17,7 @@ export interface Config {
     inviteURL: string;
     announcementChannelId: string;
     supportGuildURL: string;
+    statusEmoji: Record<string, string>;
 }
 export const config: Config = ((): Config => {
     const env = process.env.NODE_ENV ?? 'development';
