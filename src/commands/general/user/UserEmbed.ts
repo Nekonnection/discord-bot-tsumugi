@@ -23,21 +23,26 @@ class UserEmbed {
             .join(', ');
         const permssionBitfield = member.permissions.bitfield;
         const permissions = new PermissionTranslator(permssionBitfield).permissionNames;
-        const userName = `ユーザー名(ID): ${user.username}(${user.id})`;
+        const userName = `ユーザー名(ID): ${user.username} (${user.id})`;
         const userId = `表示名: ${user.globalName ?? 'なし'}`;
         const userStatus = statusAddEmoji(member.presence?.status ?? 'offline');
         const accountCreationDate = `アカウント作成日: ${dateTimeFormatter(user.createdAt)}`;
         const guildJoinDate = `サーバー参加日: ${member.joinedAt ? dateTimeFormatter(member.joinedAt) : '不明'}`;
         const memberNickname = `ニックネーム: ${member.nickname ?? 'なし'}`;
-        const memberRoles = `ロール: ${roles || 'なし'}`;
-        const memberPermissions = `権限(${String(permssionBitfield)}): \`\`\`${permissions.length > 0 ? permissions.join(', ') : 'なし'}\`\`\``;
+        const memberRoles = roles || 'なし';
+        const memberPermissions = permissions.length > 0 ? permissions.map((name) => `\`${name}\``).join(', ') : 'なし';
         const basicInfo = [userName, userId, userStatus, accountCreationDate].join('\n');
-        const memberInfo = [memberNickname, guildJoinDate, memberRoles, memberPermissions].join('\n');
+        const memberInfo = [memberNickname, guildJoinDate].join('\n');
 
         const embed = this.embedFactory
             .createBaseEmbed(user)
-            .setTitle(`${user.username}の情報`)
-            .setFields({ name: '基本情報', value: basicInfo }, { name: 'メンバー情報', value: memberInfo })
+            .setTitle(`ユーザー情報`)
+            .setFields(
+                { name: '基本情報', value: basicInfo },
+                { name: 'メンバー情報', value: memberInfo },
+                { name: `役職 (${String(member.roles.cache.size)})`, value: memberRoles },
+                { name: `権限 (${String(permssionBitfield)})`, value: memberPermissions }
+            )
             .setThumbnail(user.displayAvatarURL());
         return embed;
     }
