@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { CommandInteraction } from '../../base/command_base.js';
@@ -11,10 +11,16 @@ class UserCommand extends CommandInteraction {
         .setName('user')
         .setDescription('ユーザー情報を表示します')
         .setCategory('一般')
-        .setUsage('`/user`');
+        .setUsage('`/user [user]`')
+        .addUserOption((option) => option.setName('user').setDescription('ユーザーオブジェクト').setRequired(false)) as CustomSlashCommandBuilder;
+
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
-        const embed = UserEmbed.createUserInfoEmbed(interaction);
+
+        const user = interaction.options.getUser('user') ?? interaction.user;
+        const member = (interaction.options.getMember('user') as GuildMember | null) ?? (interaction.member as GuildMember);
+
+        const embed = UserEmbed.createUserInfoEmbed(user, member, interaction);
         await interaction.editReply({ embeds: [embed] });
     }
 }
