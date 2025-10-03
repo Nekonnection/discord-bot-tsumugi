@@ -37,7 +37,7 @@ class UserEmbed {
         const memberInfo = [memberNickname, guildJoinDate].join('\n');
 
         const embed = this.embedFactory
-            .createBaseEmbed(user)
+            .createBaseEmbed(interaction.user)
             .setTitle(`ユーザー情報`)
             .setFields(
                 { name: '基本情報', value: basicInfo },
