@@ -22,8 +22,10 @@ class UserEmbed {
                 .map((role) => role.toString())
                 .join(', ') || 'なし';
 
-        const permssionBitfield = member.permissions.bitfield;
-        const permissions = new PermissionTranslator(permssionBitfield).permissionNames;
+        const permissionBitfield = member.permissions.bitfield;
+        const permissions = new PermissionTranslator(permissionBitfield).permissionNames;
+
+                { name: `権限 (${String(permissionBitfield)})`, value: memberPermissions }
 
         const userName = `ユーザー名(ID): ${user.username} (${user.id})`;
         const userGlobalName = `表示名: ${user.globalName ?? 'なし'}`;
