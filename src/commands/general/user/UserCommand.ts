@@ -20,7 +20,7 @@ class UserCommand extends CommandInteraction {
         const user = interaction.options.getUser('user') ?? interaction.user;
         const member = (interaction.options.getMember('user') as GuildMember | null) ?? (interaction.member as GuildMember);
 
-        const embed = UserEmbed.createUserInfoEmbed(user, member, interaction);
+        const embed = UserEmbed.create(user, member, interaction);
         await interaction.editReply({ embeds: [embed] });
     }
 }

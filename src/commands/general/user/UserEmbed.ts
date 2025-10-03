@@ -15,7 +15,7 @@ class UserEmbed {
      * @param interaction コマンドのインタラクションオブジェクト（ギルド情報の参照に使用）
      * @returns ユーザー情報が設定されたEmbedBuilderインスタンス
      */
-    public createUserInfoEmbed(user: User, member: GuildMember, interaction: ChatInputCommandInteraction): EmbedBuilder {
+    public create(user: User, member: GuildMember, interaction: ChatInputCommandInteraction): EmbedBuilder {
         const roles =
             member.roles.cache
                 .filter((role) => role.id !== interaction.guild?.id)
