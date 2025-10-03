@@ -3,6 +3,9 @@ import { InteractionContextType, PermissionsBitField } from 'discord.js';
 import CustomSlashCommandBuilder from '../../utils/CustomSlashCommandBuilder.js';
 import { CommandGroupInteraction } from '../base/command_base.js';
 
+/**
+ * キーワード応答機能に関するコマンドグループ
+ */
 class KeywordCommandGroup extends CommandGroupInteraction {
     public command = new CustomSlashCommandBuilder()
         .setName('keyword')

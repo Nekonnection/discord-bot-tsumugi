@@ -4,7 +4,9 @@ import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuild
 import { CommandGroupInteraction, SubCommandInteraction } from '../base/command_base.js';
 import keywordAddModal from './action/keywordAddModal.js';
 import keywordCommandGroup from './keywordCommandGroup.js';
-
+/**
+ * キーワード登録/更新コマンド
+ */
 class KeywordAddCommand extends SubCommandInteraction {
     public command: CustomSlashSubcommandBuilder = new CustomSlashSubcommandBuilder()
         .setName('add')

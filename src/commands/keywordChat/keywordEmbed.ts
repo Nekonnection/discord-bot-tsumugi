@@ -7,7 +7,9 @@ interface PrismaKeyword {
     trigger: string;
     responses: string | string[];
 }
-
+/**
+ * キーワード関連のEmbedを生成するクラス
+ */
 class KeywordEmbed {
     private readonly embedFactory = new EmbedFactory();
     private readonly maxDescriptionLength = 2000;

@@ -14,3 +14,10 @@ inviteURL = ""
 announcementChannelId = ""
 # サポートサーバーの招待リンク
 supportGuildURL = ""
+# Discordのステータス絵文字
+[statusEmoji]
+online = ""
+idle = ""
+dnd = ""
+streaming = ""
+invisible = ""

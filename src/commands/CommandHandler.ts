@@ -7,6 +7,9 @@ import { IActionInteraction } from './base/action_base.js';
 import { AutocompleteCommandInteraction, CommandGroupInteraction, CommandInteraction, SubCommandInteraction } from './base/command_base.js';
 import { InteractionBase } from './base/interaction_base.js';
 
+/**
+ * コマンドハンドラー
+ */
 export default class CommandHandler {
     private readonly commandMap = new Map<string, InteractionBase>();
     private readonly actionMap = new Map<string, IActionInteraction>();
