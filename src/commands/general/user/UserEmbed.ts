@@ -25,8 +25,6 @@ class UserEmbed {
         const permissionBitfield = member.permissions.bitfield;
         const permissions = new PermissionTranslator(permissionBitfield).permissionNames;
 
-                { name: `権限 (${String(permissionBitfield)})`, value: memberPermissions }
-
         const userName = `ユーザー名(ID): ${user.username} (${user.id})`;
         const userGlobalName = `表示名: ${user.globalName ?? 'なし'}`;
         const userStatus = statusAddEmoji(member.presence?.status ?? 'offline');
@@ -45,7 +43,7 @@ class UserEmbed {
                 { name: '基本情報', value: basicInfo },
                 { name: 'メンバー情報', value: memberInfo },
                 { name: `役職 (${String(member.roles.cache.size - 1)})`, value: roles },
-                { name: `権限 (${String(permssionBitfield)})`, value: memberPermissions }
+                { name: `権限 (${String(permissionBitfield)})`, value: memberPermissions }
             )
             .setThumbnail(user.displayAvatarURL());
         return embed;
