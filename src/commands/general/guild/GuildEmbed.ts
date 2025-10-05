@@ -55,7 +55,7 @@ class GuildEmbed {
         const iconUrl = interaction.guild.iconURL();
         const ownerId = interaction.guild.ownerId;
         const owner = `所有者(ID): <@${ownerId}> (${ownerId})`;
-        const createAt = `作成日時: ${dateTimeFormatter(interaction.guild.joinedAt)}`;
+        const createAt = `作成日時: ${dateTimeFormatter(interaction.guild.createdAt)}`;
 
         const basicInfo = [name, owner, description, createAt].join('\n');
 
