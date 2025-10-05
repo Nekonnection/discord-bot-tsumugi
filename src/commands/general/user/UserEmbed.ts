@@ -8,7 +8,7 @@ import { statusAddEmoji } from '../../../utils/statusEmojiAdd.js';
 
 class UserEmbed {
     private readonly embedFactory = new EmbedFactory();
-
+    private static readonly maxLength = 1000;
     /**
      * ユーザー情報（サーバー参加日、ロール、権限など）を含んだEmbedを作成します。
      * @param user 表示対象のユーザーオブジェクト
@@ -23,7 +23,6 @@ class UserEmbed {
         if (roleList.length === 0) {
             roles = 'なし';
         } else {
-            const MAX_LENGTH = 1000;
             let rolesString = '';
             let processedCount = 0;
 
@@ -32,7 +31,7 @@ class UserEmbed {
 
                 const placeholderEllipsis = `, ...他${String(roleList.length)}件`;
 
-                if (rolesString.length + separator.length + role.length + placeholderEllipsis.length > MAX_LENGTH) {
+                if (rolesString.length + separator.length + role.length + placeholderEllipsis.length > UserEmbed.maxLength) {
                     break;
                 }
 
