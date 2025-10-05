@@ -14,6 +14,14 @@ inviteURL = ""
 announcementChannelId = ""
 # サポートサーバーの招待リンク
 supportGuildURL = ""
+# BOTの絵文字
+botEmoji = ""
+# メンバー絵文字
+memberEmoji = "<:member:1424280982596616196>"
+# 絵文字
+emoji = ""
+# GIF絵文字
+gifEmoji = ""
 # Discordのステータス絵文字
 [statusEmoji]
 online = ""
@@ -21,3 +29,14 @@ idle = ""
 dnd = ""
 streaming = ""
 invisible = ""
+# Discordのチャンネル絵文字
+[channelEmoji]
+publicText = ""
+lockedText = ""
+publicVoice = ""
+lockedVoice = ""
+publicAnnouncement = ""
+lockedAnnouncement = ""
+publicStage = ""
+lockedStage = ""
+category = ""
