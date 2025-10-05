@@ -17,6 +17,7 @@ export interface Config {
     inviteURL: string;
     announcementChannelId: string;
     supportGuildURL: string;
+    errorEmoji: string;
     botEmoji: string;
     memberEmoji: string;
     emoji: string;

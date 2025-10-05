@@ -10,7 +10,10 @@ export class EmbedFactory {
      * エラーEmbedを作成する
      */
     public createErrorEmbed(user: User, message: string): EmbedBuilder {
-        return this.createBaseEmbed(user).setColor(Number(config.errorColor)).setTitle('❌ エラー').setDescription(message);
+        return this.createBaseEmbed(user)
+            .setColor(Number(config.errorColor))
+            .setTitle(`${config.errorEmoji} エラーが発生しました`)
+            .setDescription(message);
     }
 
     /**
