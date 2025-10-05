@@ -17,11 +17,36 @@ class UserEmbed {
      * @returns ユーザー情報が設定されたEmbedBuilderインスタンス
      */
     public create(user: User, member: GuildMember, interaction: ChatInputCommandInteraction): EmbedBuilder {
-        const roles =
-            member.roles.cache
-                .filter((role) => role.id !== interaction.guild?.id)
-                .map((role) => role.toString())
-                .join(', ') || 'なし';
+        const roleList = member.roles.cache.filter((role) => role.id !== interaction.guild?.id).map((role) => role.toString());
+
+        let roles: string;
+        if (roleList.length === 0) {
+            roles = 'なし';
+        } else {
+            const MAX_LENGTH = 1000;
+            let rolesString = '';
+            let processedCount = 0;
+
+            for (const role of roleList) {
+                const separator = rolesString.length > 0 ? ', ' : '';
+
+                const placeholderEllipsis = `, ...他${String(roleList.length)}件`;
+
+                if (rolesString.length + separator.length + role.length + placeholderEllipsis.length > MAX_LENGTH) {
+                    break;
+                }
+
+                rolesString += separator + role;
+                processedCount++;
+            }
+
+            if (processedCount < roleList.length) {
+                const remainingCount = String(roleList.length - processedCount);
+                rolesString += `, ...他${remainingCount}件`;
+            }
+
+            roles = rolesString;
+        }
 
         const permissionBitfield = member.permissions.bitfield;
         const permissions = new PermissionTranslator(permissionBitfield).permissionNames;
