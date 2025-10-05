@@ -6,6 +6,7 @@ import { dateTimeFormatter } from '../../../utils/dateTimeFormatter.js';
 
 class GuildEmbed {
     private readonly embedFactory = new EmbedFactory();
+    private static readonly maxLength = 1000;
 
     public create(interaction: ChatInputCommandInteraction): EmbedBuilder {
         if (!interaction.guild) {
@@ -93,12 +94,37 @@ class GuildEmbed {
 
         const soundBoardCount = `サウンドボード数: ${String(interaction.guild.soundboardSounds.cache.size)}`;
 
-        const roleList = interaction.guild.roles.cache
+        const roleMentionList = interaction.guild.roles.cache
             .filter((role) => role.id !== interaction.guild?.id)
             .sort((a, b) => b.position - a.position)
-            .map((role) => `<@&${role.id}>`)
-            .join(', ');
-        const roles = roleList.length > 0 ? roleList : 'なし';
+            .map((role) => `<@&${role.id}>`);
+
+        let roles: string;
+        if (roleMentionList.length === 0) {
+            roles = 'なし';
+        } else {
+            let rolesString = '';
+            let processedCount = 0;
+
+            for (const roleMention of roleMentionList) {
+                const separator = rolesString.length > 0 ? ', ' : '';
+                const placeholderEllipsis = `, ...他${String(roleMentionList.length)}件`;
+
+                if (rolesString.length + separator.length + roleMention.length + placeholderEllipsis.length > GuildEmbed.maxLength) {
+                    break;
+                }
+
+                rolesString += separator + roleMention;
+                processedCount++;
+            }
+
+            if (processedCount < roleMentionList.length) {
+                const remainingCount = roleMentionList.length - processedCount;
+                rolesString += `, ...他${String(remainingCount)}件`;
+            }
+            roles = rolesString;
+        }
+
         const statsInfo = [memberInfo, boostInfo, channelCountInfoLine, emojiInfo, stickerCount, soundBoardCount].join('\n');
 
         const embed = this.embedFactory
