@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
 import { CommandInteraction } from '../../base/command_base.js';
@@ -17,10 +17,7 @@ class UserCommand extends CommandInteraction {
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
 
-        const user = interaction.options.getUser('user') ?? interaction.user;
-        const member = (interaction.options.getMember('user') as GuildMember | null) ?? (interaction.member as GuildMember);
-
-        const embed = UserEmbed.create(user, member, interaction);
+        const embed = await UserEmbed.create(interaction);
         await interaction.editReply({ embeds: [embed] });
     }
 }
