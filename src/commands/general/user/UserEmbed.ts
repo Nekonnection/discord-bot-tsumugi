@@ -17,10 +17,7 @@ class UserEmbed {
      */
     public async create(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         if (!interaction.guild) {
-            return this.embedFactory
-                .createBaseEmbed(interaction.user)
-                .setTitle('エラー')
-                .setDescription('このコマンドはサーバー内でのみ使用できます。');
+            return this.embedFactory.createErrorEmbed(interaction.user, 'このコマンドはサーバー内でのみ使用できます。');
         }
         const targetUser = interaction.options.getUser('user') ?? interaction.user;
 
@@ -29,10 +26,7 @@ class UserEmbed {
             member = await interaction.guild.members.fetch(targetUser.id);
         } catch (error) {
             console.error(`メンバーの取得に失敗しました: ${targetUser.id}`, error);
-            return this.embedFactory
-                .createBaseEmbed(interaction.user)
-                .setTitle('エラー')
-                .setDescription(`メンバーの取得に失敗しました: ${targetUser.id}`);
+            return this.embedFactory.createErrorEmbed(interaction.user, 'メンバーの取得に失敗しました。');
         }
 
         const user = member.user;

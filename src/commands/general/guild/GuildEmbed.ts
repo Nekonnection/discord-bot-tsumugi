@@ -3,6 +3,7 @@ import { ChannelType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.
 import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { config } from '../../../utils/config.js';
 import { dateTimeFormatter } from '../../../utils/dateTimeFormatter.js';
+import { logger } from '../../../utils/log.js';
 
 class GuildEmbed {
     private readonly embedFactory = new EmbedFactory();
@@ -10,7 +11,7 @@ class GuildEmbed {
 
     public async create(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         if (!interaction.guildId) {
-            return this.embedFactory.createBaseEmbed(interaction.user).setTitle('エラー').setDescription('サーバー情報の取得に失敗しました。');
+            return this.embedFactory.createErrorEmbed(interaction.user, 'サーバー情報の取得に失敗しました。');
         }
 
         try {
@@ -148,8 +149,8 @@ class GuildEmbed {
 
             return embed;
         } catch (error) {
-            console.error('サーバー情報の取得中にエラーが発生しました:', error);
-            return this.embedFactory.createBaseEmbed(interaction.user).setTitle('エラー').setDescription('サーバー情報の取得に失敗しました。');
+            logger.error('サーバー情報の取得中にエラーが発生しました:', error);
+            return this.embedFactory.createErrorEmbed(interaction.user, 'サーバー情報の取得中にエラーが発生しました。');
         }
     }
 }
