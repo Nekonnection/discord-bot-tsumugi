@@ -25,8 +25,6 @@ class KeywordListCommand extends SubCommandInteraction {
 
     /** @inheritdoc */
     public async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const triggerKeyword = interaction.options.getString('keyword');
 
         if (triggerKeyword) {

@@ -15,8 +15,6 @@ class UserCommand extends CommandInteraction {
         .addUserOption((option) => option.setName('user').setDescription('ユーザーオブジェクト').setRequired(false)) as CustomSlashCommandBuilder;
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const embed = await UserEmbed.create(interaction);
         await interaction.editReply({ embeds: [embed] });
     }

@@ -11,8 +11,6 @@ class PingCommand extends CommandInteraction {
     public command = new CustomSlashCommandBuilder().setName('ping').setDescription('Pingを表示します').setCategory('一般').setUsage('`/ping`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const pingingEmbed = PingEmbed.createPingingEmbed(interaction);
         await interaction.editReply({
             embeds: [pingingEmbed]

@@ -12,8 +12,6 @@ class GuildCommand extends CommandInteraction {
         .setUsage('`/guild`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const embed = await guildEmbed.create(interaction);
         await interaction.editReply({ embeds: [embed] });
     }

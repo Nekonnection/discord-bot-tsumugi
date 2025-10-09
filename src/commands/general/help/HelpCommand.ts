@@ -31,8 +31,6 @@ class HelpCommand extends AutocompleteCommandInteraction {
     }
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const commandName = interaction.options.getString('command_name');
         if (commandName) {
             const commandInfo = CommandService.findCommandName(commandName);
