@@ -12,6 +12,8 @@ iconURL = ""
 inviteURL = ""
 # BotのアナウンスチャンネルID
 announcementChannelId = ""
+# BOTの入退室チャンネルID
+botEntranceChannelId = ""
 # サポートサーバーの招待リンク
 supportGuildURL = ""
 # エラー絵文字
@@ -19,7 +21,7 @@ errorEmoji = ""
 # BOTの絵文字
 botEmoji = ""
 # メンバー絵文字
-memberEmoji = "<:member:1424280982596616196>"
+memberEmoji = ""
 # 絵文字
 emoji = ""
 # GIF絵文字
