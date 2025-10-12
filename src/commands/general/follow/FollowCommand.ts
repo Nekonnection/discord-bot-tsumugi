@@ -1,4 +1,4 @@
-import { ChannelType, ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js';
 
 import { config } from '../../../utils/config.js';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
@@ -16,9 +16,6 @@ class FollowCommand extends CommandInteraction {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply({
-            flags: MessageFlags.Ephemeral
-        });
         const announcementChannel = await interaction.client.channels.fetch(config.announcementChannelId);
         if (announcementChannel && announcementChannel.type == ChannelType.GuildAnnouncement) {
             const channelId = interaction.channel?.id;

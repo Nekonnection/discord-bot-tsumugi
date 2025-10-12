@@ -16,8 +16,6 @@ class OmikujiCommand extends CommandInteraction {
         .setUsage('`/omikuji`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const result = OmikujiService.draw();
         const embed = OmikujiEmbed.create(interaction, result);
 

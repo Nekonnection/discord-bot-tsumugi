@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder, GuildMember, User } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, GuildMember } from 'discord.js';
 
 import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { config } from '../../../utils/config.js';
@@ -9,14 +9,27 @@ import { statusAddEmoji } from '../../../utils/statusEmojiAdd.js';
 class UserEmbed {
     private readonly embedFactory = new EmbedFactory();
     private static readonly maxLength = 1000;
+
     /**
-     * ユーザー情報（サーバー参加日、ロール、権限など）を含んだEmbedを作成します。
-     * @param user 表示対象のユーザーオブジェクト
-     * @param member 表示対象のギルドメンバーオブジェクト
-     * @param interaction コマンドのインタラクションオブジェクト（ギルド情報の参照に使用）
-     * @returns ユーザー情報が設定されたEmbedBuilderインスタンス
+     * ユーザーIDを元にメンバー情報をAPIから取得し、情報（サーバー参加日、ロール、権限など）を含んだEmbedを作成します。
+     * @param interaction コマンドのインタラクションオブジェクト
+     * @returns ユーザー情報が設定されたEmbedBuilderインスタンス、またはエラー時のEmbed
      */
-    public create(user: User, member: GuildMember, interaction: ChatInputCommandInteraction): EmbedBuilder {
+    public async create(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
+        if (!interaction.guild) {
+            return this.embedFactory.createErrorEmbed(interaction.user, 'このコマンドはサーバー内でのみ使用できます。');
+        }
+        const targetUser = interaction.options.getUser('user') ?? interaction.user;
+
+        let member: GuildMember;
+        try {
+            member = await interaction.guild.members.fetch(targetUser.id);
+        } catch (error) {
+            console.error(`メンバーの取得に失敗しました: ${targetUser.id}`, error);
+            return this.embedFactory.createErrorEmbed(interaction.user, 'メンバーの取得に失敗しました。');
+        }
+
+        const user = member.user;
         const roleList = member.roles.cache.filter((role) => role.id !== interaction.guild?.id).map((role) => role.toString());
 
         let roles: string;
@@ -28,8 +41,8 @@ class UserEmbed {
 
             for (const role of roleList) {
                 const separator = rolesString.length > 0 ? ', ' : '';
-
-                const placeholderEllipsis = `, ...他${String(roleList.length)}件`;
+                const remainingCount = roleList.length - processedCount;
+                const placeholderEllipsis = `, ...他${String(remainingCount)}件`;
 
                 if (rolesString.length + separator.length + role.length + placeholderEllipsis.length > UserEmbed.maxLength) {
                     break;
@@ -50,7 +63,7 @@ class UserEmbed {
         const permissionBitfield = member.permissions.bitfield;
         const permissions = new PermissionTranslator(permissionBitfield).permissionNames;
 
-        const botEmoji = member.user.bot ? config.botEmoji : '';
+        const botEmoji = user.bot ? config.botEmoji : '';
         const userName = `ユーザー名(ID): ${user.username} (${user.id})`;
         const userGlobalName = `表示名: ${user.globalName ?? 'なし'}`;
         const userStatus = statusAddEmoji(member.presence?.status ?? 'offline');
@@ -63,13 +76,15 @@ class UserEmbed {
         const basicInfo = [userName, userGlobalName, userStatus, accountCreationDate].join('\n');
         const memberInfo = [memberNickname, guildJoinDate].join('\n');
 
+        const roleCount = member.roles.cache.size - 1;
+
         const embed = this.embedFactory
             .createBaseEmbed(interaction.user)
             .setTitle(`ユーザー情報 ${botEmoji}`)
             .setFields(
                 { name: '基本情報', value: basicInfo },
                 { name: 'メンバー情報', value: memberInfo },
-                { name: `役職 (${String(member.roles.cache.size - 1)})`, value: roles },
+                { name: `役職 (${String(roleCount)})`, value: roles },
                 { name: `権限 (${String(permissionBitfield)})`, value: memberPermissions }
             )
             .setThumbnail(user.displayAvatarURL());

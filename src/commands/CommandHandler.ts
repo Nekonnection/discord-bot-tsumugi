@@ -1,5 +1,6 @@
 import { ApplicationCommandDataResolvable, Interaction, MessageFlags } from 'discord.js';
 
+import { EmbedFactory } from '../factories/EmbedFactory.js';
 import { client } from '../index.js';
 import { config } from '../utils/config.js';
 import { logger } from '../utils/log.js';
@@ -22,6 +23,7 @@ export default class CommandHandler {
 
     private static readonly actionIdKey = '_';
 
+    private readonly embedFactory = new EmbedFactory();
     /**
      * コマンドハンドラーを初期化する
      * @param allInteractions 全インタラクションのリスト
@@ -93,14 +95,18 @@ export default class CommandHandler {
             if (!interaction.isRepliable()) {
                 return;
             }
-
+            const errorEmbed = this.embedFactory.createErrorEmbed(
+                interaction.user,
+                'インタラクションの処理中にエラーが発生しました。時間をおいて再度お試しください。'
+            );
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({
-                    content: '処理中にエラーが発生しました。'
+                    embeds: [errorEmbed],
+                    flags: MessageFlags.Ephemeral
                 });
             } else {
                 await interaction.reply({
-                    content: '処理中にエラーが発生しました。',
+                    embeds: [errorEmbed],
                     flags: MessageFlags.Ephemeral
                 });
             }

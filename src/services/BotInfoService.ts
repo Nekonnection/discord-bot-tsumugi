@@ -1,5 +1,5 @@
 import pkg from '../../package.json' with { type: 'json' };
-import ReadyEvent from '../events/ready.js';
+import ReadyEvent from '../events/ClientReadyEvent.js';
 import { client } from '../index.js';
 
 // ボット情報のデータ構造を定義

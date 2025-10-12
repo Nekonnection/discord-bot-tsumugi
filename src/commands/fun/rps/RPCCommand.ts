@@ -30,8 +30,6 @@ class RPCCommand extends CommandInteraction {
         ) as CustomSlashCommandBuilder;
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const userHand = interaction.options.getString('hand', true) as Hand;
         const botHand = BOT_HANDS[Math.floor(Math.random() * BOT_HANDS.length)];
 

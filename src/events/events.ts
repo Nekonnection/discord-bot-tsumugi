@@ -1,6 +1,6 @@
-import interactionCreateEvent from './interactionCreate.js';
-import messageCreate from './messageCreate.js';
-import readyEvent from './ready.js';
+import readyEvent from './ClientReadyEvent.js';
+import interactionCreateEvent from './InteractionCreateEvent.js';
+import messageCreate from './MessageCreateEvent.js';
 
 const events = [readyEvent, interactionCreateEvent, messageCreate];
 

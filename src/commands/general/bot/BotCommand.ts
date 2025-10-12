@@ -15,8 +15,6 @@ class BotCommand extends CommandInteraction {
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            await interaction.deferReply();
-
             const botInfo = BotInfoService.getBotInfo();
 
             const embed = BotEmbed.create(interaction, botInfo);

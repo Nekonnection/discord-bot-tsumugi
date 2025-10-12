@@ -14,6 +14,8 @@ inviteURL = ""
 announcementChannelId = ""
 # サポートサーバーの招待リンク
 supportGuildURL = ""
+# エラー絵文字
+errorEmoji = ""
 # BOTの絵文字
 botEmoji = ""
 # メンバー絵文字

@@ -89,6 +89,7 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
 
         if (!(await permissionChecker.checkPermissions(interaction))) return;
 
+        await interaction.deferReply();
         await this.onCommand(interaction);
     }
 
@@ -135,6 +136,7 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
     public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) return;
         if (!this.isMyInteraction(interaction)) return;
+        await interaction.deferReply();
         await this.onCommand(interaction);
     }
 
@@ -166,6 +168,7 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
             const permissionChecker = new PermissionChecker(this.command);
 
             if (!(await permissionChecker.checkPermissions(interaction))) return;
+            await interaction.deferReply();
             await this.onCommand(interaction);
         } else if (interaction.isAutocomplete()) {
             await this.onAutocomplete(interaction);
