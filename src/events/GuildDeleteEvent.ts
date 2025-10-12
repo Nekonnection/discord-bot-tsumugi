@@ -26,7 +26,7 @@ class GuildDeleteEvent extends EventBase<'guildDelete'> {
         const embed = this.embedFactory
             .createSystemEmbed()
             .setTitle('BOT退出通知')
-            .setFields({ name: '基本情報', value: basicInfo }, { name: 'BOT退出数', value: guildDeleteCount })
+            .setFields({ name: '基本情報', value: basicInfo }, { name: '導入サーバー数', value: guildDeleteCount })
             .setThumbnail(iconURL);
 
         const channel = guild.client.channels.cache.get(config.botEntranceChannelId);

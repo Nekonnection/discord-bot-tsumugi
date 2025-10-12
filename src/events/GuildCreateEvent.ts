@@ -26,7 +26,7 @@ class GuildCreateEvent extends EventBase<'guildCreate'> {
         const embed = this.embedFactory
             .createSystemEmbed()
             .setTitle('BOT導入通知')
-            .setFields({ name: '基本情報', value: basicInfo }, { name: 'BOT導入数', value: guildAddCount })
+            .setFields({ name: '基本情報', value: basicInfo }, { name: '導入サーバー数', value: guildAddCount })
             .setThumbnail(iconURL);
 
         const channel = guild.client.channels.cache.get(config.botEntranceChannelId);
@@ -35,4 +35,5 @@ class GuildCreateEvent extends EventBase<'guildCreate'> {
         }
     }
 }
+
 export default new GuildCreateEvent();
