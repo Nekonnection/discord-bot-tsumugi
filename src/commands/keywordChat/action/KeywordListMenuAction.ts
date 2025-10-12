@@ -2,7 +2,7 @@ import { ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuI
 
 import { prisma } from '../../../index.js';
 import { MessageComponentActionInteraction } from '../../base/action_base.js';
-import keywordEmbed from '../keywordEmbed.js';
+import keywordEmbed from '../KeywordEmbed.js';
 
 /**
  * キーワード一覧のページネーションメニューの作成と処理を行う

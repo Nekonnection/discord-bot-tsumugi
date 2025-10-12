@@ -4,8 +4,8 @@ import { prisma } from '../../index.js';
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { SubCommandInteraction } from '../base/command_base.js';
 import keywordListMenuAction from './action/KeywordListMenuAction.js';
-import keywordCommandGroup from './keywordCommandGroup.js';
-import keywordEmbed from './keywordEmbed.js';
+import keywordCommandGroup from './KeywordCommandGroup.js';
+import keywordEmbed from './KeywordEmbed.js';
 /**
  * キーワード一覧表示コマンド
  */

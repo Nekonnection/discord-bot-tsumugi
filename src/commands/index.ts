@@ -10,12 +10,12 @@ import helpOperationMenuAction from './general/help/actions/HelpOperationMenuAct
 import helpCommand from './general/help/HelpCommand.js';
 import pingCommand from './general/ping/PingCommand.js';
 import userCommand from './general/user/UserCommand.js';
-import keywordAddModal from './keywordChat/action/keywordAddModal.js';
+import keywordAddModal from './keywordChat/action/KeywordAddModal.js';
 import keywordListMenuAction from './keywordChat/action/KeywordListMenuAction.js';
-import keywordAddCommand from './keywordChat/keywordAddCommand.js';
-import keywordCommandGroup from './keywordChat/keywordCommandGroup.js';
-import keywordListCommand from './keywordChat/keywordListCommand.js';
-import keywordRemoveCommand from './keywordChat/keywordRemoveCommand.js';
+import keywordAddCommand from './keywordChat/KeywordAddCommand.js';
+import keywordCommandGroup from './keywordChat/KeywordCommandGroup.js';
+import keywordListCommand from './keywordChat/KeywordListCommand.js';
+import keywordRemoveCommand from './keywordChat/KeywordRemoveCommand.js';
 
 const commands: InteractionBase[] = [
     pingCommand,

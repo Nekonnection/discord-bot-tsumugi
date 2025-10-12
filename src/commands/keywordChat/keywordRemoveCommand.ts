@@ -4,7 +4,7 @@ import { prisma } from '../../index.js';
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { logger } from '../../utils/log.js';
 import { SubCommandInteraction } from '../base/command_base.js';
-import keywordCommandGroup from './keywordCommandGroup.js';
+import keywordCommandGroup from './KeywordCommandGroup.js';
 
 /**
  * キーワード削除コマンド

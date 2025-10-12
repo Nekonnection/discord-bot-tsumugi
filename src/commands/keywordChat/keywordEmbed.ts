@@ -1,4 +1,3 @@
-// src/commands/keyword/keywordEmbed.ts
 import { EmbedBuilder, User } from 'discord.js';
 
 import { EmbedFactory } from '../../factories/EmbedFactory.js';

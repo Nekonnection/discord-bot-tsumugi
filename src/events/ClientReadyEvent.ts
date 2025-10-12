@@ -4,7 +4,7 @@ import { client, commandHandler } from '../index.js';
 import { logger } from '../utils/log.js';
 import { EventBase } from './base/event_base.js';
 
-class ReadyEvent extends EventBase<'clientReady'> {
+class ClientReadyEvent extends EventBase<'clientReady'> {
     public eventName = 'clientReady' as const;
     public static totalGuilds = '情報取得中...';
     public static totalUsers = '情報取得中...';
@@ -36,10 +36,10 @@ class ReadyEvent extends EventBase<'clientReady'> {
     }
 
     private updateStatsAndActivity(): void {
-        ReadyEvent.totalGuilds = this.checkTotalGuilds();
-        ReadyEvent.totalUsers = this.checkTotalUsers();
+        ClientReadyEvent.totalGuilds = this.checkTotalGuilds();
+        ClientReadyEvent.totalUsers = this.checkTotalUsers();
 
-        const name = `/help | Servers: ${ReadyEvent.totalGuilds} | Users: ${ReadyEvent.totalUsers}`;
+        const name = `/help | Servers: ${ClientReadyEvent.totalGuilds} | Users: ${ClientReadyEvent.totalUsers}`;
 
         client.user?.setActivity({ name, type: ActivityType.Playing });
     }
@@ -53,4 +53,4 @@ class ReadyEvent extends EventBase<'clientReady'> {
     }
 }
 
-export default new ReadyEvent();
+export default new ClientReadyEvent();

@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction, ModalBuilder, PermissionsBitField } from '
 
 import CustomSlashSubcommandBuilder from '../../utils/CustomSlashSubCommandBuilder.js';
 import { CommandGroupInteraction, SubCommandInteraction } from '../base/command_base.js';
-import keywordAddModal from './action/keywordAddModal.js';
-import keywordCommandGroup from './keywordCommandGroup.js';
+import keywordAddModal from './action/KeywordAddModal.js';
+import keywordCommandGroup from './KeywordCommandGroup.js';
 /**
  * キーワード登録/更新コマンド
  */
