@@ -28,4 +28,10 @@ export class EmbedFactory {
                 iconURL: user.displayAvatarURL() || undefined
             });
     }
+    /**
+     * システムで使用するEmbedメソッド
+     */
+    public createSystemEmbed(): EmbedBuilder {
+        return new EmbedBuilder().setColor(Number(config.botColor)).setTimestamp();
+    }
 }
