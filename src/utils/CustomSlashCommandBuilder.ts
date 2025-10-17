@@ -1,14 +1,15 @@
 import { SlashCommandBuilder } from 'discord.js';
 
 class CustomSlashCommandBuilder extends SlashCommandBuilder {
-    public cooldown?: number;
     public category?: string;
     public usage?: string;
+    public cooldown?: number;
     public defaultBotPermissions?: string;
 
     public constructor() {
         super();
     }
+
     public setCooldown(seconds: number): this {
         this.cooldown = seconds;
         return this;
