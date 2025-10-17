@@ -9,7 +9,7 @@ class CustomSlashCommandBuilder extends SlashCommandBuilder {
     public constructor() {
         super();
     }
-    public setCoolDown(seconds: number): this {
+    public setCooldown(seconds: number): this {
         this.cooldown = seconds;
         return this;
     }
