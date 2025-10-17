@@ -65,7 +65,7 @@ export class HelpEmbed {
             .setDescription(description)
             .addFields(
                 { name: 'カテゴリー', value: category },
-                { name: '使い方', value: usage },
+                { name: '使用方法', value: usage },
                 { name: '実行可能か', value: permissionStatus, inline: true },
                 { name: 'ユーザーに必要な権限', value: memberPermissionList, inline: true },
                 { name: 'Botに必要な権限', value: botPermissionList, inline: true }
