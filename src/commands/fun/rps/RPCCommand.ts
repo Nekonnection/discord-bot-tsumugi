@@ -20,6 +20,7 @@ class RPCCommand extends CommandInteraction {
         .setName('rpc')
         .setDescription('Botとじゃんけんをします。')
         .setCategory('お遊び系')
+        .setCooldown(5)
         .setUsage('`/rpc hand:[グー/チョキ/パー]`')
         .addStringOption((option) =>
             option

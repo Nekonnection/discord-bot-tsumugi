@@ -11,7 +11,12 @@ import BotEmbed from './BotEmbed.js';
  * Botコマンド
  */
 class BotCommand extends CommandInteraction {
-    public command = new CustomSlashCommandBuilder().setName('bot').setDescription('Botの情報を表示します').setCategory('一般').setUsage('`/bot`');
+    public command = new CustomSlashCommandBuilder()
+        .setName('bot')
+        .setDescription('Botの情報を表示します')
+        .setCategory('一般')
+        .setCooldown(5)
+        .setUsage('`/bot`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         try {

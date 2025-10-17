@@ -9,7 +9,12 @@ const REELS = ['7️⃣', '🍒', '🍋', '🔔', '🍉', '⭐', '💎'];
  * スロットコマンド
  */
 class SlotCommand extends CommandInteraction {
-    public command = new CustomSlashCommandBuilder().setName('slot').setDescription('スロットを回します').setCategory('お遊び系').setUsage('`/slot`');
+    public command = new CustomSlashCommandBuilder()
+        .setName('slot')
+        .setDescription('スロットを回します')
+        .setCategory('お遊び系')
+        .setCooldown(5)
+        .setUsage('`/slot`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         const rotatingEmbed = SlotEmbed.createRotatingEmbed(interaction);

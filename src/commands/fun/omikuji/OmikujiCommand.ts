@@ -13,6 +13,7 @@ class OmikujiCommand extends CommandInteraction {
         .setName('omikuji')
         .setDescription('おみくじが引けます')
         .setCategory('お遊び系')
+        .setCooldown(5)
         .setUsage('`/omikuji`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {

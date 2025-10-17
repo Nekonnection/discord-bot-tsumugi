@@ -12,6 +12,7 @@ class KeywordCommandGroup extends CommandGroupInteraction {
         .setDescription('キーワード応答機能に関する設定を行います')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .setCategory('キーワード応答機能')
+        .setCooldown(5)
         .setContexts(InteractionContextType.Guild);
 }
 

@@ -8,7 +8,12 @@ import PingEmbed from './PingEmbed.js';
  * Pingコマンド
  */
 class PingCommand extends CommandInteraction {
-    public command = new CustomSlashCommandBuilder().setName('ping').setDescription('Pingを表示します').setCategory('一般').setUsage('`/ping`');
+    public command = new CustomSlashCommandBuilder()
+        .setName('ping')
+        .setDescription('Pingを表示します')
+        .setCooldown(5)
+        .setCategory('一般')
+        .setUsage('`/ping`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         const pingingEmbed = PingEmbed.createPingingEmbed(interaction);

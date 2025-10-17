@@ -11,6 +11,7 @@ class UserCommand extends CommandInteraction {
         .setName('user')
         .setDescription('ユーザー情報を表示します')
         .setCategory('一般')
+        .setCooldown(10)
         .setUsage('`/user [user]`')
         .addUserOption((option) => option.setName('user').setDescription('ユーザーオブジェクト').setRequired(false)) as CustomSlashCommandBuilder;
 
