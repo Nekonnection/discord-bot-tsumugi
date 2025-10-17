@@ -1,4 +1,4 @@
-import { ApplicationCommandDataResolvable, Interaction, MessageFlags } from 'discord.js';
+import { ApplicationCommandDataResolvable, ChatInputCommandInteraction, Collection, Interaction, MessageFlags } from 'discord.js';
 
 import { EmbedFactory } from '../factories/EmbedFactory.js';
 import { client } from '../index.js';
@@ -14,6 +14,7 @@ import { InteractionBase } from './base/interaction_base.js';
 export default class CommandHandler {
     private readonly commandMap = new Map<string, InteractionBase>();
     private readonly actionMap = new Map<string, IActionInteraction>();
+    private readonly cooldowns = new Collection<string, Collection<string, number>>();
 
     public readonly commands: InteractionBase[] = [];
     public readonly actions: IActionInteraction[] = [];
@@ -34,7 +35,9 @@ export default class CommandHandler {
         });
 
         logger.info(
-            `読み込まれたコマンド: ${String(this.commandCount)}件, サブコマンド: ${String(this.subCommandCount)}件, アクション: ${String(this.actions.length)}件`
+            `読み込まれたコマンド: ${String(this.commandCount)}件, サブコマンド: ${String(
+                this.subCommandCount
+            )}件, アクション: ${String(this.actions.length)}件`
         );
     }
 
@@ -69,6 +72,11 @@ export default class CommandHandler {
                     logger.warn(`不明なコマンドキー[${commandKey}]が実行されました。`);
                     return;
                 }
+
+                const commandData = command.command as { cooldown?: number };
+                const isCooldown = await this.isCooldown(interaction, commandKey, commandData.cooldown);
+                if (isCooldown) return;
+
                 await command.onInteractionCreate(interaction);
             } else if ('customId' in interaction && typeof interaction.customId === 'string') {
                 const params = new URLSearchParams(interaction.customId);
@@ -86,7 +94,7 @@ export default class CommandHandler {
                 await action.onInteractionCreate(interaction);
             } else if (interaction.isAutocomplete()) {
                 const command = this.commandMap.get(interaction.commandName);
-                if (command && command instanceof AutocompleteCommandInteraction) {
+                if (command instanceof AutocompleteCommandInteraction) {
                     await command.onInteractionCreate(interaction);
                 }
             }
@@ -144,5 +152,46 @@ export default class CommandHandler {
             this.commandCount++;
             this.commandMap.set(interaction.command.name, interaction);
         }
+    }
+
+    /**
+     * コマンドのクールダウンを処理します。
+     * @param interaction ChatInputCommandInteraction
+     * @param commandKey 実行されたコマンドのキー
+     * @param cooldownSeconds クールダウン秒数
+     * @returns {Promise<boolean>} クールダウン中の場合は true を返します。
+     */
+    private async isCooldown(interaction: ChatInputCommandInteraction, commandKey: string, cooldownSeconds?: number): Promise<boolean> {
+        if (!cooldownSeconds || cooldownSeconds <= 0) {
+            return false;
+        }
+
+        const timestamps = this.cooldowns.get(commandKey) ?? new Collection<string, number>();
+        if (!this.cooldowns.has(commandKey)) {
+            this.cooldowns.set(commandKey, timestamps);
+        }
+
+        const now = Date.now();
+        const cooldownAmount = cooldownSeconds * 1000;
+        const userId = interaction.user.id;
+
+        const expirationTime = (timestamps.get(userId) ?? 0) + cooldownAmount;
+        if (now < expirationTime) {
+            const expiredTimestamp = String(Math.round(expirationTime / 1000));
+            const timeLeftEmbed = this.embedFactory.createErrorEmbed(
+                interaction.user,
+                `このコマンドはクールダウン中です。\n<t:${expiredTimestamp}:R> に再試行してください。`
+            );
+            await interaction.reply({
+                embeds: [timeLeftEmbed],
+                flags: MessageFlags.Ephemeral
+            });
+            return true;
+        }
+
+        timestamps.set(userId, now);
+        setTimeout(() => timestamps.delete(userId), cooldownAmount);
+
+        return false;
     }
 }
