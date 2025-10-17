@@ -9,6 +9,7 @@ class GuildCommand extends CommandInteraction {
         .setName('guild')
         .setDescription('サーバー情報を表示します')
         .setCategory('一般')
+        .setCooldown(10)
         .setUsage('`/guild`');
 
     protected async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {

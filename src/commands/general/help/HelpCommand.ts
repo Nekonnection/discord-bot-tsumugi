@@ -14,6 +14,7 @@ class HelpCommand extends AutocompleteCommandInteraction {
         .setName('help')
         .setDescription('Botのヘルプを表示します')
         .setCategory('一般')
+        .setCooldown(5)
         .setUsage('`/help`, `/help ping`')
         .addStringOption((option) =>
             option.setName('command_name').setDescription('指定したコマンドの詳細情報を表示します。').setAutocomplete(true)

@@ -3,10 +3,19 @@ import { SlashCommandBuilder } from 'discord.js';
 class CustomSlashCommandBuilder extends SlashCommandBuilder {
     public category?: string;
     public usage?: string;
+    public cooldown?: number;
     public defaultBotPermissions?: string;
 
     public constructor() {
         super();
+    }
+
+    public setCooldown(seconds: number): this {
+        this.cooldown = seconds;
+        if (seconds <= 0) {
+            throw new Error('Cooldown must be a positive number');
+        }
+        return this;
     }
 
     public setCategory(category: string): this {

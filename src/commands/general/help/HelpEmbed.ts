@@ -40,9 +40,12 @@ export class HelpEmbed {
             description = '説明がありません',
             category = '未分類',
             usage = '使用方法が設定されていません',
+            cooldown = 'なし',
             defaultBotPermissions
         } = commandInfo.command;
         let defaultUserPermissions: string | number | bigint = 0;
+
+        const cooldownText = typeof cooldown === 'number' ? `${String(cooldown)}秒` : 'なし';
 
         if (commandInfo instanceof CommandInteraction) {
             defaultUserPermissions = commandInfo.command.default_member_permissions ?? 0;
@@ -65,7 +68,8 @@ export class HelpEmbed {
             .setDescription(description)
             .addFields(
                 { name: 'カテゴリー', value: category },
-                { name: '使い方', value: usage },
+                { name: '使用方法', value: usage },
+                { name: 'クールダウン', value: cooldownText },
                 { name: '実行可能か', value: permissionStatus, inline: true },
                 { name: 'ユーザーに必要な権限', value: memberPermissionList, inline: true },
                 { name: 'Botに必要な権限', value: botPermissionList, inline: true }

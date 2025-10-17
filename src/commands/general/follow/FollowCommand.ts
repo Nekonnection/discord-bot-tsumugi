@@ -12,6 +12,7 @@ class FollowCommand extends CommandInteraction {
         .setDescription('Botからのお知らせをフォローして、チャンネルに通知するようにします。')
         .setCategory('一般')
         .setUsage('`/follow`')
+        .setCooldown(5)
         .setDefaultBotPermissions(PermissionFlagsBits.ManageChannels)
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
