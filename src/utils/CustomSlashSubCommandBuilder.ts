@@ -12,6 +12,9 @@ class CustomSlashSubcommandBuilder extends SlashCommandSubcommandBuilder {
 
     public setCooldown(seconds: number): this {
         this.cooldown = seconds;
+        if (seconds <= 0) {
+            throw new Error('Cooldown must be a positive number');
+        }
         return this;
     }
 
