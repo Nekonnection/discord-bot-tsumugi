@@ -80,6 +80,14 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.commandName === this.command.name;
     }
+    /**
+     * 自動的に deferReplyを実行するか判定する
+     * @remarks デフォルトではtrueを返します。必要に応じてオーバーライドすること。
+     * @returns 自動的にdeferする場合はtrue
+     */
+    protected shouldDeferReply(): boolean {
+        return true;
+    }
 
     /** @inheritdoc */
     public override async onInteractionCreate(interaction: Interaction): Promise<void> {
@@ -89,7 +97,9 @@ export abstract class CommandInteraction extends InteractionBase implements Comm
 
         if (!(await permissionChecker.checkPermissions(interaction))) return;
 
-        await interaction.deferReply();
+        if (this.shouldDeferReply()) {
+            await interaction.deferReply();
+        }
         await this.onCommand(interaction);
     }
 
@@ -131,12 +141,22 @@ export abstract class SubCommandInteraction extends InteractionBase implements C
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return this._registry.isMyInteraction(interaction) && interaction.options.getSubcommand(false) === this.command.name;
     }
+    /**
+     * 自動的に deferReplyを実行するか判定する
+     * @remarks デフォルトではtrueを返します。必要に応じてオーバーライドすること。
+     * @returns 自動的にdeferする場合はtrue
+     */
+    protected shouldDeferReply(): boolean {
+        return true;
+    }
 
     /** @inheritdoc */
     public override async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) return;
         if (!this.isMyInteraction(interaction)) return;
-        await interaction.deferReply();
+        if (this.shouldDeferReply()) {
+            await interaction.deferReply();
+        }
         await this.onCommand(interaction);
     }
 
@@ -161,6 +181,14 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
     public isMyInteraction(interaction: ChatInputCommandInteraction): boolean {
         return interaction.commandName === this.command.name;
     }
+    /**
+     * 自動的に deferReplyを実行するか判定する
+     * @remarks デフォルトではtrueを返します。必要に応じてオーバーライドすること。
+     * @returns 自動的にdeferする場合はtrue
+     */
+    protected shouldDeferReply(): boolean {
+        return true;
+    }
 
     /** @inheritdoc */
     public override async onInteractionCreate(interaction: Interaction): Promise<void> {
@@ -168,7 +196,9 @@ export abstract class AutocompleteCommandInteraction extends InteractionBase imp
             const permissionChecker = new PermissionChecker(this.command);
 
             if (!(await permissionChecker.checkPermissions(interaction))) return;
-            await interaction.deferReply();
+            if (this.shouldDeferReply()) {
+                await interaction.deferReply();
+            }
             await this.onCommand(interaction);
         } else if (interaction.isAutocomplete()) {
             await this.onAutocomplete(interaction);
