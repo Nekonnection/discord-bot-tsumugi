@@ -19,6 +19,9 @@ class KeywordAddCommand extends SubCommandInteraction {
         super(keywordCommandGroup as CommandGroupInteraction);
     }
 
+    protected override shouldDeferReply(): boolean {
+        return false;
+    }
     /** @inheritdoc */
     public async onCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         const modal: ModalBuilder = keywordAddModal.create();
