@@ -46,17 +46,24 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
             orderBy: { trigger: 'asc' }
         });
 
-        const prismaKeywords = prismaKeywordsRaw.map((k) => ({
-            ...k,
-            responses:
-                k.responses === null
-                    ? []
-                    : Array.isArray(k.responses)
-                      ? k.responses.filter((v): v is string => typeof v === 'string')
-                      : typeof k.responses === 'string'
-                        ? k.responses
-                        : []
-        }));
+        const prismaKeywords = prismaKeywordsRaw.map((k) => {
+            let response;
+
+            if (k.responses) {
+                response = [];
+            } else if (Array.isArray(k.responses)) {
+                response = k.responses.filter((v): v is string => typeof v === 'string');
+            } else if (typeof k.responses === 'string') {
+                response = k.responses;
+            } else {
+                response = [];
+            }
+
+            return {
+                ...k,
+                responses: response as string | string[]
+            };
+        });
 
         const embeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
 

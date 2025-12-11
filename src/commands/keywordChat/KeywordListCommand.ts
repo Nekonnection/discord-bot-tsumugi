@@ -51,14 +51,22 @@ class KeywordListCommand extends SubCommandInteraction {
             return;
         }
         // ページ分割されたEmbedの配列を生成
-        const typedKeywords = prismaKeywords.map((k) => ({
-            ...k,
-            responses: Array.isArray(k.responses)
-                ? k.responses.filter((r): r is string => typeof r === 'string')
-                : typeof k.responses === 'string'
-                  ? [k.responses]
-                  : []
-        }));
+        const typedKeywords = prismaKeywords.map((k) => {
+            let responsesArray: string[];
+
+            if (Array.isArray(k.responses)) {
+                responsesArray = k.responses.filter((r): r is string => typeof r === 'string');
+            } else if (typeof k.responses === 'string') {
+                responsesArray = [k.responses];
+            } else {
+                responsesArray = [];
+            }
+
+            return {
+                ...k,
+                responses: responsesArray
+            };
+        });
         const embeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, typedKeywords);
         const firstEmbed = embeds[0];
 
@@ -92,14 +100,23 @@ class KeywordListCommand extends SubCommandInteraction {
             return;
         }
 
-        const typedKeyword = {
-            ...keyword,
-            responses: Array.isArray(keyword.responses)
-                ? keyword.responses.filter((r): r is string => typeof r === 'string')
-                : typeof keyword.responses === 'string'
-                  ? [keyword.responses]
-                  : []
-        };
+        const typedKeyword = ((): { trigger: string; responses: string[] } => {
+            let responsesArray: string[];
+
+            if (Array.isArray(keyword.responses)) {
+                responsesArray = keyword.responses.filter((r): r is string => typeof r === 'string');
+            } else if (typeof keyword.responses === 'string') {
+                responsesArray = [keyword.responses];
+            } else {
+                responsesArray = [];
+            }
+
+            return {
+                trigger: keyword.trigger,
+                responses: responsesArray
+            };
+        })();
+
         const embed = keywordEmbed.createKeywordResponsesEmbed(interaction.user, typedKeyword);
         await interaction.editReply({ embeds: [embed] });
     }
