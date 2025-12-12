@@ -18,7 +18,7 @@ class GuildCreateEvent extends EventBase<'guildCreate'> {
                 ownerName = owner.user.username;
                 ownerId = owner.user.id;
             } catch (error) {
-                logger.warn(error);
+                logger.warn('所有権者の取得に失敗', error);
             }
 
             const description = guild.description ?? 'なし';
@@ -45,7 +45,7 @@ class GuildCreateEvent extends EventBase<'guildCreate'> {
                 await channel.send({ embeds: [embed] });
             }
         } catch (error) {
-            logger.error(error);
+            logger.error('GuildCreateEventでエラーが発生', error);
         }
     }
 }

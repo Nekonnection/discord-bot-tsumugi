@@ -18,14 +18,14 @@ class GuildDeleteEvent extends EventBase<'guildDelete'> {
                 ownerName = owner.user.username;
                 ownerId = owner.user.id;
             } catch (error) {
-                logger.warn(error);
+                logger.warn('所有権者の取得に失敗', error);
             }
 
             const description = guild.description ?? 'なし';
 
             const basicInfo = [
                 `**名前(ID)**: ${guild.name} (\`${guild.id}\`)`,
-                `**所有者(ID)**: ${ownerName} (\`${ownerId}\`)`,
+                `**所有権者(ID)**: ${ownerName} (\`${ownerId}\`)`,
                 `**作成日時**: ${dateTimeFormatter(guild.createdAt)}`,
                 `**メンバー数**: ${guild.memberCount.toLocaleString()}人`,
                 `**説明**: \n${description}`
@@ -45,7 +45,7 @@ class GuildDeleteEvent extends EventBase<'guildDelete'> {
                 await channel.send({ embeds: [embed] });
             }
         } catch (error) {
-            logger.error(error);
+            logger.error('GuildDeleteEventでエラーが発生', error);
         }
     }
 }
