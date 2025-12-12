@@ -1,17 +1,16 @@
 import { ChannelType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { config } from '../../../utils/config.js';
 import { dateTimeFormatter } from '../../../utils/dateTimeFormatter.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { logger } from '../../../utils/log.js';
 
 class GuildEmbed {
-    private readonly embedFactory = new EmbedFactory();
     private static readonly maxLength = 1000;
 
     public async create(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         if (!interaction.guildId) {
-            return this.embedFactory.createErrorEmbed(interaction.user, 'サーバー情報の取得に失敗しました。');
+            return embeds.error(interaction.user, 'サーバー情報の取得に失敗しました。');
         }
 
         try {
@@ -137,8 +136,8 @@ class GuildEmbed {
 
             const statsInfo = [memberInfo, boostInfo, channelCountInfoLine, emojiInfo, stickerCount, soundBoardCount].join('\n');
 
-            const embed = this.embedFactory
-                .createBaseEmbed(interaction.user)
+            const embed = embeds
+                .info(interaction.user)
                 .setTitle('サーバー情報')
                 .setFields(
                     { name: '基本情報', value: basicInfo, inline: true },
@@ -150,7 +149,7 @@ class GuildEmbed {
             return embed;
         } catch (error) {
             logger.error('サーバー情報の取得中にエラーが発生しました:', error);
-            return this.embedFactory.createErrorEmbed(interaction.user, 'サーバー情報の取得中にエラーが発生しました。');
+            return embeds.error(interaction.user, 'サーバー情報の取得中にエラーが発生しました。');
         }
     }
 }
