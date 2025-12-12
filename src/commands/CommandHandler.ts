@@ -1,8 +1,15 @@
-import { ApplicationCommandDataResolvable, ChatInputCommandInteraction, Collection, Interaction, MessageFlags } from 'discord.js';
+import {
+    ApplicationCommandDataResolvable,
+    ChatInputCommandInteraction,
+    Collection,
+    Interaction,
+    InteractionReplyOptions,
+    MessageFlags
+} from 'discord.js';
 
-import { EmbedFactory } from '../factories/EmbedFactory.js';
 import { client } from '../index.js';
 import { config } from '../utils/config.js';
+import { embeds } from '../utils/EmbedGenerator.js';
 import { logger } from '../utils/log.js';
 import { IActionInteraction } from './base/action_base.js';
 import { AutocompleteCommandInteraction, CommandGroupInteraction, CommandInteraction, SubCommandInteraction } from './base/command_base.js';
@@ -10,10 +17,12 @@ import { InteractionBase } from './base/interaction_base.js';
 
 /**
  * コマンドハンドラー
+ * アプリケーション全体のインタラクションを一元管理する
  */
 export default class CommandHandler {
     private readonly commandMap = new Map<string, InteractionBase>();
     private readonly actionMap = new Map<string, IActionInteraction>();
+
     private readonly cooldowns = new Collection<string, Collection<string, number>>();
 
     public readonly commands: InteractionBase[] = [];
@@ -24,7 +33,6 @@ export default class CommandHandler {
 
     private static readonly actionIdKey = '_';
 
-    private readonly embedFactory = new EmbedFactory();
     /**
      * コマンドハンドラーを初期化する
      * @param allInteractions 全インタラクションのリスト
@@ -35,9 +43,7 @@ export default class CommandHandler {
         });
 
         logger.info(
-            `読み込まれたコマンド: ${String(this.commandCount)}件, サブコマンド: ${String(
-                this.subCommandCount
-            )}件, アクション: ${String(this.actions.length)}件`
+            `読み込まれたコマンド: ${String(this.commandCount)}件, サブコマンド: ${String(this.subCommandCount)}件, アクション: ${String(this.actions.length)}件`
         );
     }
 
@@ -45,16 +51,20 @@ export default class CommandHandler {
      * コマンドをDiscord APIに登録する
      */
     public async registerCommands(): Promise<void> {
-        const guild = await client.guilds.fetch(config.guildId);
-        const applicationCommands: ApplicationCommandDataResolvable[] = [];
+        try {
+            const guild = await client.guilds.fetch(config.guildId);
+            const applicationCommands: ApplicationCommandDataResolvable[] = [];
 
-        this.commands.forEach((command) => {
-            command.registerSubCommands();
-            command.registerCommands(applicationCommands);
-        });
+            this.commands.forEach((command) => {
+                command.registerSubCommands();
+                command.registerCommands(applicationCommands);
+            });
 
-        await guild.commands.set(applicationCommands);
-        logger.info(`${String(applicationCommands.length)}個のコマンドを登録しました。`);
+            await guild.commands.set(applicationCommands);
+            logger.info(`${String(applicationCommands.length)}個のコマンドを登録しました。`);
+        } catch (error) {
+            logger.error('コマンドの登録中にエラーが発生しました:', error);
+        }
     }
 
     /**
@@ -64,76 +74,102 @@ export default class CommandHandler {
     public async onInteractionCreate(interaction: Interaction): Promise<void> {
         try {
             if (interaction.isChatInputCommand()) {
-                const subcommand = interaction.options.getSubcommand(false);
-                const commandKey = subcommand ? `${interaction.commandName} ${subcommand}` : interaction.commandName;
-                const command = this.commandMap.get(commandKey);
-
-                if (!command) {
-                    logger.warn(`不明なコマンドキー[${commandKey}]が実行されました。`);
-                    return;
-                }
-
-                const commandData = command.command as { cooldown?: number };
-                const isCooldown = await this.isCooldown(interaction, commandKey, commandData.cooldown);
-                if (isCooldown) return;
-
-                await command.onInteractionCreate(interaction);
+                await this.handleChatInputCommand(interaction);
             } else if ('customId' in interaction && typeof interaction.customId === 'string') {
-                const params = new URLSearchParams(interaction.customId);
-                const actionId = params.get(CommandHandler.actionIdKey);
-
-                if (!actionId) {
-                    return;
-                }
-
-                const action = this.actionMap.get(actionId);
-                if (!action) {
-                    logger.warn(`不明なアクションID[${actionId}]を持つインタラクションが実行されました。`);
-                    return;
-                }
-                await action.onInteractionCreate(interaction);
+                await this.handleActionInteraction(interaction);
             } else if (interaction.isAutocomplete()) {
-                const command = this.commandMap.get(interaction.commandName);
-                if (command instanceof AutocompleteCommandInteraction) {
-                    await command.onInteractionCreate(interaction);
-                }
+                await this.handleAutocomplete(interaction);
             }
         } catch (error) {
-            logger.error('インタラクションの処理中にエラーが発生しました:', error);
-            if (!interaction.isRepliable()) {
-                return;
-            }
-            const errorEmbed = this.embedFactory.createErrorEmbed(
-                interaction.user,
-                'インタラクションの処理中にエラーが発生しました。時間をおいて再度お試しください。'
-            );
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({
-                    embeds: [errorEmbed],
-                    flags: MessageFlags.Ephemeral
-                });
-            } else {
-                await interaction.reply({
-                    embeds: [errorEmbed],
-                    flags: MessageFlags.Ephemeral
-                });
-            }
+            await this.handleInteractionError(interaction, error);
+        }
+    }
+
+    /**
+     * コマンドの処理
+     */
+    private async handleChatInputCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+        const subcommand = interaction.options.getSubcommand(false);
+        const commandKey = subcommand ? `${interaction.commandName} ${subcommand}` : interaction.commandName;
+        const command = this.commandMap.get(commandKey);
+
+        if (!command) {
+            logger.warn(`不明なコマンドキー[${commandKey}]が実行されました。`);
+            return;
+        }
+
+        const commandData = command.command as { cooldown?: number };
+        if (await this.isCooldown(interaction, commandKey, commandData.cooldown)) {
+            return;
+        }
+
+        await command.onInteractionCreate(interaction);
+    }
+
+    /**
+     * アクションの処理
+     */
+    private async handleActionInteraction(interaction: Interaction): Promise<void> {
+        if (!('customId' in interaction) || typeof interaction.customId !== 'string') return;
+
+        const params = new URLSearchParams(interaction.customId);
+        const actionId = params.get(CommandHandler.actionIdKey);
+
+        if (!actionId) return;
+
+        const action = this.actionMap.get(actionId);
+        if (!action) {
+            logger.warn(`不明なアクションID[${actionId}]を持つインタラクションが実行されました。`);
+            return;
+        }
+        await action.onInteractionCreate(interaction);
+    }
+
+    /**
+     * オートコンプリートの処理
+     */
+    private async handleAutocomplete(interaction: Interaction): Promise<void> {
+        if (!interaction.isAutocomplete()) return;
+
+        const command = this.commandMap.get(interaction.commandName);
+        if (command instanceof AutocompleteCommandInteraction) {
+            await command.onInteractionCreate(interaction);
+        }
+    }
+
+    /**
+     * インタラクション処理中のエラーハンドリング
+     */
+    private async handleInteractionError(interaction: Interaction, error: unknown): Promise<void> {
+        logger.error('インタラクションの処理中にエラーが発生しました:', error);
+
+        if (!interaction.isRepliable()) return;
+
+        const errorEmbed = embeds.error(interaction.user, '処理中に予期せぬエラーが発生しました。\n時間をおいて再度お試しください。');
+
+        const replyOptions: InteractionReplyOptions = {
+            embeds: [errorEmbed],
+            flags: [MessageFlags.Ephemeral]
+        };
+
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp(replyOptions);
+        } else {
+            await interaction.reply(replyOptions);
         }
     }
 
     /**
      * 渡されたInteractionを分類し、それぞれのMapに登録する
-     * @param interaction 登録するインタラクション
      */
     private registerInteraction(interaction: InteractionBase): void {
-        if ('id' in interaction && typeof (interaction as { id: unknown }).id === 'string') {
+        if ('id' in interaction && typeof (interaction as IActionInteraction).id === 'string') {
             const action = interaction as IActionInteraction;
             this.actions.push(action);
             this.actionMap.set(action.id, action);
         }
-        if (!interaction.command?.name) {
-            return;
-        }
+
+        if (!interaction.command?.name) return;
 
         this.commands.push(interaction);
 
@@ -155,33 +191,28 @@ export default class CommandHandler {
     }
 
     /**
-     * コマンドのクールダウンを処理します。
-     * @param interaction ChatInputCommandInteraction
-     * @param commandKey 実行されたコマンドのキー
-     * @param cooldownSeconds クールダウン秒数
-     * @returns {Promise<boolean>} クールダウン中の場合は true を返します。
+     * コマンドのクールダウンを処理します
      */
     private async isCooldown(interaction: ChatInputCommandInteraction, commandKey: string, cooldownSeconds?: number): Promise<boolean> {
-        if (!cooldownSeconds || cooldownSeconds <= 0) {
-            return false;
-        }
+        if (!cooldownSeconds || cooldownSeconds <= 0) return false;
 
-        const timestamps = this.cooldowns.get(commandKey) ?? new Collection<string, number>();
-        if (!this.cooldowns.has(commandKey)) {
-            this.cooldowns.set(commandKey, timestamps);
-        }
+        const timestamps = this.cooldowns.ensure(commandKey, () => new Collection<string, number>());
 
         const now = Date.now();
         const cooldownAmount = cooldownSeconds * 1000;
         const userId = interaction.user.id;
 
-        const expirationTime = (timestamps.get(userId) ?? 0) + cooldownAmount;
-        if (now < expirationTime) {
-            const expiredTimestamp = String(Math.round(expirationTime / 1000));
-            const timeLeftEmbed = this.embedFactory.createErrorEmbed(
+        const validTimestamp = timestamps.get(userId);
+
+        if (validTimestamp && now < validTimestamp + cooldownAmount) {
+            const expirationTime = validTimestamp + cooldownAmount;
+            const expiredTimestamp = Math.round(expirationTime / 1000);
+
+            const timeLeftEmbed = embeds.error(
                 interaction.user,
-                `このコマンドはクールダウン中です。\n<t:${expiredTimestamp}:R> に再試行してください。`
+                `このコマンドはクールダウン中です。\n<t:${String(expiredTimestamp)}:R> に再試行してください。`
             );
+
             await interaction.reply({
                 embeds: [timeLeftEmbed],
                 flags: MessageFlags.Ephemeral
@@ -190,6 +221,7 @@ export default class CommandHandler {
         }
 
         timestamps.set(userId, now);
+
         setTimeout(() => timestamps.delete(userId), cooldownAmount);
 
         return false;
