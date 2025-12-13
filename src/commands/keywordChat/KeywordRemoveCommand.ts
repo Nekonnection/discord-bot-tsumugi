@@ -45,7 +45,7 @@ class KeywordRemoveCommand extends SubCommandInteraction {
             await interaction.reply({ content: `キーワード「${trigger}」を削除しました。`, flags: MessageFlags.Ephemeral });
         } catch (error) {
             await interaction.reply({ content: `キーワード「${trigger}」は見つかりませんでした。`, flags: MessageFlags.Ephemeral });
-            logger.error('キーワード削除エラー: ', error);
+            logger.error('キーワード削除処理中にエラーが発生', error);
         }
     }
 }
