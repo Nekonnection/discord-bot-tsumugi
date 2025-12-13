@@ -1,6 +1,7 @@
 import { ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 import { prisma } from '../../../index.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { MessageComponentActionInteraction } from '../../base/action_base.js';
 import keywordEmbed from '../KeywordEmbed.js';
 
@@ -37,7 +38,8 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
         const selectedPageIndex = parseInt(interaction.values[0], 10);
         const channelId = interaction.channel?.id;
         if (!channelId) {
-            await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', flags: MessageFlags.Ephemeral });
+            const embed = embeds.error(interaction.user, 'チャンネル情報が取得できませんでした。');
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -65,11 +67,12 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
             };
         });
 
-        const embeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
+        const keywordListEmbeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
 
-        const targetEmbed = embeds[selectedPageIndex];
-        if (selectedPageIndex < 0 || selectedPageIndex >= embeds.length) {
-            await interaction.update({ content: '指定されたページの表示に失敗しました。', embeds: [], components: [] });
+        const targetEmbed = keywordListEmbeds[selectedPageIndex];
+        if (selectedPageIndex < 0 || selectedPageIndex >= keywordListEmbeds.length) {
+            const embed = embeds.error(interaction.user, '指定されたページの表示に失敗しました。');
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             return;
         }
 
