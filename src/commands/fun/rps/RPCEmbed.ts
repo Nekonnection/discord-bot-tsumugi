@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, ColorResolvable, EmbedBuilder } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 
 export type Hand = 'rock' | 'scissors' | 'paper';
 export interface GameResult {
@@ -24,7 +24,6 @@ export const RESULTS: Record<'win' | 'lose' | 'draw', GameResult> = {
  * じゃんけんコマンドの埋め込みメッセージを作成する
  */
 class RPCEmbed {
-    private readonly embedFactory = new EmbedFactory();
     /**
      * じゃんけんの結果を表示するEmbedを作成します。
      * @param interaction コマンドのインタラクション
@@ -34,8 +33,8 @@ class RPCEmbed {
      * @returns 作成されたEmbedBuilder
      */
     public create(interaction: ChatInputCommandInteraction, userHand: Hand, botHand: Hand, result: GameResult): EmbedBuilder {
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setTitle('じゃんけんぽん！')
             .setDescription(result.message)
             .setColor(result.color)

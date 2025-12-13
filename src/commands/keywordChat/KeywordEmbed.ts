@@ -1,6 +1,6 @@
 import { EmbedBuilder, User } from 'discord.js';
 
-import { EmbedFactory } from '../../factories/EmbedFactory.js';
+import { embeds } from '../../utils/EmbedGenerator.js';
 
 interface PrismaKeyword {
     trigger: string;
@@ -10,7 +10,6 @@ interface PrismaKeyword {
  * キーワード関連のEmbedを生成するクラス
  */
 class KeywordEmbed {
-    private readonly embedFactory = new EmbedFactory();
     private readonly maxDescriptionLength = 2000;
     private readonly separator = ', ';
 
@@ -23,17 +22,17 @@ class KeywordEmbed {
      */
     public createPaginatedTriggerListEmbeds(user: User, keywords: PrismaKeyword[]): EmbedBuilder[] {
         if (keywords.length === 0) {
-            return [this.embedFactory.createBaseEmbed(user).setDescription('このサーバーにはキーワードが登録されていません。')];
+            return [embeds.info(user).setDescription('このサーバーにはキーワードが登録されていません。')];
         }
 
-        const embeds: EmbedBuilder[] = [];
+        const keywordListEmbeds: EmbedBuilder[] = [];
         let currentDescription = '';
 
         for (const keyword of keywords) {
             const triggerText = `\`${keyword.trigger}\``;
 
             if (currentDescription.length + triggerText.length + this.separator.length > this.maxDescriptionLength) {
-                embeds.push(this.createBaseListEmbed(user, currentDescription));
+                keywordListEmbeds.push(this.createBaseListEmbed(user, currentDescription));
                 currentDescription = triggerText;
             } else {
                 if (currentDescription.length > 0) {
@@ -44,14 +43,14 @@ class KeywordEmbed {
         }
 
         if (currentDescription.length > 0) {
-            embeds.push(this.createBaseListEmbed(user, currentDescription));
+            keywordListEmbeds.push(this.createBaseListEmbed(user, currentDescription));
         }
 
-        embeds.forEach((embed, index) => {
-            embed.setTitle(`キーワード一覧 (${String(index + 1)} / ${String(embeds.length)})`);
+        keywordListEmbeds.forEach((embed, index) => {
+            embed.setTitle(`キーワード一覧 (${String(index + 1)} / ${String(keywordListEmbeds.length)})`);
         });
 
-        return embeds;
+        return keywordListEmbeds;
     }
 
     /**
@@ -64,7 +63,7 @@ class KeywordEmbed {
         const responses = Array.isArray(keyword.responses) ? keyword.responses : [keyword.responses];
         const description = responses.map((res) => `- ${res}`).join('\n');
 
-        const embed = this.embedFactory.createBaseEmbed(user).setTitle(`キーワード「${keyword.trigger}」の応答一覧`).setDescription(description);
+        const embed = embeds.info(user).setTitle(`キーワード「${keyword.trigger}」の応答一覧`).setDescription(description);
 
         return embed;
     }
@@ -76,7 +75,7 @@ class KeywordEmbed {
      * @returns 生成されたEmbedBuilder
      */
     private createBaseListEmbed(user: User, description: string): EmbedBuilder {
-        return this.embedFactory.createBaseEmbed(user).setDescription(description).setFields({
+        return embeds.info(user).setDescription(description).setFields({
             name: 'キーワードの応答確認方法',
             value: '各キーワードの応答を確認するには `/keyword list keyword: <キーワード>` を使用してください。'
         });

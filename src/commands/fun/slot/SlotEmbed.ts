@@ -1,20 +1,19 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 
 /**
  * スロットコマンドの埋め込みメッセージを生成する
  */
 class SlotEmbed {
-    private readonly embedFactory = new EmbedFactory();
     /**
      * スロットが回転している最中のEmbedを作成します。
      * @param interaction コマンドのインタラクション
      * @returns 作成されたEmbedBuilder
      */
     public createRotatingEmbed(interaction: ChatInputCommandInteraction): EmbedBuilder {
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setTitle('スロットを回しています...')
             .setDescription('**回** | **転** | **中**\n**転** | **中** | **回**\n**中** | **回** | **転**');
     }
@@ -28,7 +27,7 @@ class SlotEmbed {
     public createResultEmbed(interaction: ChatInputCommandInteraction, results: string[]): EmbedBuilder {
         const [r1, r2, r3] = results;
         const resultLine = `**${r1} | ${r2} | ${r3}**`;
-        const embed = this.embedFactory.createBaseEmbed(interaction.user).setTitle('スロットの結果').setDescription(resultLine);
+        const embed = embeds.info(interaction.user).setTitle('スロットの結果').setDescription(resultLine);
 
         if (r1 === r2 && r2 === r3) {
             embed.addFields({ name: '結果', value: '🎉 **大当たり！** 🎉' });

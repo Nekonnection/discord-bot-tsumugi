@@ -1,13 +1,12 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { OmikujiResult } from '../../../services/OmikujiService.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 
 /**
  * おみくじコマンドの埋め込みメッセージを作成する
  */
 class OmikujiEmbed {
-    private readonly embedFactory = new EmbedFactory();
     /**
      * おみくじの結果からEmbedを作成します。
      * @param interaction コマンドのインタラクション
@@ -27,10 +26,7 @@ class OmikujiEmbed {
         **病気:** ${result.disease}
         `;
 
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
-            .setTitle(`${interaction.user.displayName}さんのおみくじの結果`)
-            .setDescription(description);
+        return embeds.info(interaction.user).setTitle(`${interaction.user.displayName}さんのおみくじの結果`).setDescription(description);
     }
 }
 

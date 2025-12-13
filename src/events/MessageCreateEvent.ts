@@ -37,7 +37,7 @@ class MessageCreateEvent extends EventBase<'messageCreate'> {
                 }
             }
         } catch (error) {
-            logger.error('キーワードの取得中にエラーが発生しました。', error);
+            logger.error('MessageCreateEventでエラーが発生', error);
             return;
         }
     }

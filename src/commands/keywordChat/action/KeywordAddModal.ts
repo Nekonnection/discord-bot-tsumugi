@@ -1,6 +1,7 @@
 import { ActionRowBuilder, MessageFlags, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { prisma } from '../../../index.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { logger } from '../../../utils/log.js';
 import { ModalActionInteraction } from '../../base/action_base.js';
 
@@ -48,8 +49,9 @@ class KeywordAddModal extends ModalActionInteraction {
 
         const mentionPattern = /<@!?&?(\d{17,20})>/i;
         if (responses.some((res) => mentionPattern.test(res) || res.includes('@everyone') || res.includes('@here'))) {
+            const embed = embeds.error(interaction.user, '応答メッセージにメンションを含めることはできません。');
             await interaction.reply({
-                content: '応答メッセージにメンションを含めることはできません。',
+                embeds: [embed],
                 flags: MessageFlags.Ephemeral
             });
             return;
@@ -59,8 +61,9 @@ class KeywordAddModal extends ModalActionInteraction {
         const hasForbiddenPattern = responses.some((response) => forbiddenPatterns.some((pattern) => pattern.test(response)));
 
         if (hasForbiddenPattern) {
+            const embed = embeds.error(interaction.user, '応答メッセージに機密情報と疑われる形式の文字列が含まれています。');
             await interaction.reply({
-                content: '応答メッセージに、機密情報と疑われる形式の文字列が含まれているため登録できません。',
+                embeds: [embed],
                 flags: MessageFlags.Ephemeral
             });
             return;
@@ -100,9 +103,10 @@ class KeywordAddModal extends ModalActionInteraction {
                 flags: MessageFlags.Ephemeral
             });
         } catch (error) {
-            logger.error(error);
+            logger.error(interaction, error);
+            const embed = embeds.error(interaction.user, 'キーワードの登録中にエラーが発生しました。');
             await interaction.reply({
-                content: 'キーワードの登録中にエラーが発生しました。',
+                embeds: [embed],
                 flags: MessageFlags.Ephemeral
             });
         }

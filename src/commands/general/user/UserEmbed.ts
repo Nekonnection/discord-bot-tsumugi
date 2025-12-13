@@ -1,13 +1,12 @@
 import { ChatInputCommandInteraction, EmbedBuilder, GuildMember } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { config } from '../../../utils/config.js';
 import { dateTimeFormatter } from '../../../utils/dateTimeFormatter.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { PermissionTranslator } from '../../../utils/PermissionTranslator.js';
 import { statusAddEmoji } from '../../../utils/statusEmojiAdd.js';
 
 class UserEmbed {
-    private readonly embedFactory = new EmbedFactory();
     private static readonly maxLength = 1000;
 
     /**
@@ -17,7 +16,7 @@ class UserEmbed {
      */
     public async create(interaction: ChatInputCommandInteraction): Promise<EmbedBuilder> {
         if (!interaction.guild) {
-            return this.embedFactory.createErrorEmbed(interaction.user, 'このコマンドはサーバー内でのみ使用できます。');
+            return embeds.error(interaction.user, 'このコマンドはサーバー内でのみ使用できます。');
         }
         const targetUser = interaction.options.getUser('user') ?? interaction.user;
 
@@ -26,7 +25,7 @@ class UserEmbed {
             member = await interaction.guild.members.fetch(targetUser.id);
         } catch (error) {
             console.error(`メンバーの取得に失敗しました: ${targetUser.id}`, error);
-            return this.embedFactory.createErrorEmbed(interaction.user, 'メンバーの取得に失敗しました。');
+            return embeds.error(interaction.user, 'メンバーの取得に失敗しました。');
         }
 
         const user = member.user;
@@ -78,8 +77,8 @@ class UserEmbed {
 
         const roleCount = member.roles.cache.size - 1;
 
-        const embed = this.embedFactory
-            .createBaseEmbed(interaction.user)
+        const embed = embeds
+            .info(interaction.user)
             .setTitle(`ユーザー情報 ${botEmoji}`)
             .setFields(
                 { name: '基本情報', value: basicInfo },
