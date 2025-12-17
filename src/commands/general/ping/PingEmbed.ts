@@ -1,19 +1,18 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Message } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 
 /**
  * Pingコマンドの埋め込みメッセージを作成する
  */
 class PingEmbed {
-    private readonly embedFactory = new EmbedFactory();
     /**
      * Ping測定中のEmbedを作成します。
      * @param interaction コマンドのインタラクション
      * @returns 作成されたEmbedBuilder
      */
     public createPingingEmbed(interaction: ChatInputCommandInteraction): EmbedBuilder {
-        return this.embedFactory.createBaseEmbed(interaction.user).setTitle('Pingを測定中...');
+        return embeds.info(interaction.user).setTitle('Pingを測定中...');
     }
 
     /**
@@ -26,8 +25,8 @@ class PingEmbed {
         const wsPing = interaction.client.ws.ping;
         const apiLatency = replyMessage.createdTimestamp - interaction.createdTimestamp;
 
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setTitle('Pingを測定しました')
             .setFields(
                 {

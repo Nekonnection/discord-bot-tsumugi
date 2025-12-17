@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, EmbedBuilder, StringSelectMenuInteraction } from 'discord.js';
 
-import { EmbedFactory } from '../../../factories/EmbedFactory.js';
 import { CategorizedCommands } from '../../../services/CommandService.js';
 import { config } from '../../../utils/config.js';
 import CustomSlashCommandBuilder from '../../../utils/CustomSlashCommandBuilder.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { PermissionTranslator } from '../../../utils/PermissionTranslator.js';
 import { CommandInteraction, SubCommandInteraction } from '../../base/command_base.js';
 
@@ -13,16 +13,14 @@ const translatePermission = (bitfield: bigint): string[] => new PermissionTransl
  * ヘルプコマンドに関連するEmbedを生成するクラス
  */
 export class HelpEmbed {
-    private readonly embedFactory = new EmbedFactory();
-
     public createHomeEmbed(interaction: HelpInteraction, commandsCategoryList: CategorizedCommands[]): EmbedBuilder {
         const categoryPages =
             commandsCategoryList.length > 0
                 ? commandsCategoryList.map((category, index) => `${String(index + 1)}ページ目: ${category.category}`).join('\n')
                 : '利用可能なコマンドカテゴリはありません。';
 
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setAuthor({ name: '猫咲 紬 - ヘルプ', iconURL: config.iconURL })
             .setDescription('コマンドの詳細は`/help [コマンド名]`で表示できます。')
             .addFields(
@@ -62,8 +60,8 @@ export class HelpEmbed {
         const memberPermissionList = translatePermission(memberPerms).join('\n') || 'なし';
         const botPermissionList = translatePermission(botPerms).join('\n') || 'なし';
 
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setAuthor({ name: `猫咲 紬 - コマンド詳細 [${name}]`, iconURL: config.iconURL })
             .setDescription(description)
             .addFields(
@@ -85,8 +83,8 @@ export class HelpEmbed {
             inline: false
         }));
 
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setAuthor({ name: `猫咲 紬 - ${categoryData.category}`, iconURL: config.iconURL })
             .addFields(commandList);
     }
@@ -94,8 +92,8 @@ export class HelpEmbed {
      * コマンドガイドのEmbedを作成する
      */
     public createGuideEmbed(interaction: StringSelectMenuInteraction): EmbedBuilder {
-        return this.embedFactory
-            .createBaseEmbed(interaction.user)
+        return embeds
+            .info(interaction.user)
             .setAuthor({ name: '猫咲 紬 - コマンドガイド', iconURL: config.iconURL })
             .setDescription('現在、スラッシュコマンドに移行中です。\n今後の更新でプレフィックスコマンドはサポートされなくなります。')
             .setFields({
@@ -108,7 +106,7 @@ export class HelpEmbed {
      * エラーEmbedを作成する
      */
     public createErrorEmbed(interaction: HelpInteraction, message: string): EmbedBuilder {
-        return this.embedFactory.createErrorEmbed(interaction.user, message);
+        return embeds.error(interaction.user, message);
     }
 }
 

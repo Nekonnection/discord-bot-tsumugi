@@ -1,6 +1,7 @@
 import { ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 import { prisma } from '../../../index.js';
+import { embeds } from '../../../utils/EmbedGenerator.js';
 import { MessageComponentActionInteraction } from '../../base/action_base.js';
 import keywordEmbed from '../KeywordEmbed.js';
 
@@ -37,7 +38,8 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
         const selectedPageIndex = parseInt(interaction.values[0], 10);
         const channelId = interaction.channel?.id;
         if (!channelId) {
-            await interaction.reply({ content: 'チャンネル情報が取得できませんでした。', flags: MessageFlags.Ephemeral });
+            const embed = embeds.error(interaction.user, 'チャンネル情報が取得できませんでした。');
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -46,25 +48,33 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
             orderBy: { trigger: 'asc' }
         });
 
-        const prismaKeywords = prismaKeywordsRaw.map((k) => ({
-            ...k,
-            responses:
-                k.responses === null
-                    ? []
-                    : Array.isArray(k.responses)
-                      ? k.responses.filter((v): v is string => typeof v === 'string')
-                      : typeof k.responses === 'string'
-                        ? k.responses
-                        : []
-        }));
+        const prismaKeywords = prismaKeywordsRaw.map((k) => {
+            let response: string | string[] = [];
 
-        const embeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
+            if (k.responses) {
+                response = [];
+            } else if (Array.isArray(k.responses)) {
+                response = k.responses.filter((v): v is string => typeof v === 'string');
+            } else if (typeof k.responses === 'string') {
+                response = k.responses;
+            } else {
+                response = [];
+            }
 
-        const targetEmbed = embeds[selectedPageIndex];
-        if (selectedPageIndex < 0 || selectedPageIndex >= embeds.length) {
-            await interaction.update({ content: '指定されたページの表示に失敗しました。', embeds: [], components: [] });
+            return {
+                ...k,
+                responses: response
+            };
+        });
+
+        const keywordListEmbeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
+
+        if (!Number.isInteger(selectedPageIndex) || selectedPageIndex < 0 || selectedPageIndex >= keywordListEmbeds.length) {
+            const embed = embeds.error(interaction.user, '指定されたページの表示に失敗しました。');
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             return;
         }
+        const targetEmbed = keywordListEmbeds[selectedPageIndex];
 
         await interaction.update({ embeds: [targetEmbed] });
     }

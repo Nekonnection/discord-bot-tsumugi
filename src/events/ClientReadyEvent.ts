@@ -17,7 +17,7 @@ class ClientReadyEvent extends EventBase<'clientReady'> {
             this.startUpdateLoop();
             logger.info(`起動完了: ${client.user?.tag ?? 'Unknown User'}`);
         } catch (error) {
-            logger.error('onReady中にエラーが発生しました。', error);
+            logger.error('ClientReadyEventでエラーが発生', error);
         }
     }
 
@@ -26,7 +26,7 @@ class ClientReadyEvent extends EventBase<'clientReady'> {
             try {
                 this.updateStatsAndActivity();
             } catch (error) {
-                logger.error('ステータスの定期更新中にエラーが発生しました。', error);
+                logger.error('ステータスの定期更新中にエラーが発生', error);
             } finally {
                 setTimeout(() => {
                     this.startUpdateLoop();
