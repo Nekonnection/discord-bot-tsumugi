@@ -56,7 +56,7 @@ class AppLogger {
      */
     public warn(source: string | BaseInteraction, detail?: unknown): void {
         let context = '';
-        if (source instanceof BaseInteraction) {
+        if (typeof source !== 'string') {
             context = this.extractContext(source);
         }
 
