@@ -69,12 +69,12 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
 
         const keywordListEmbeds = keywordEmbed.createPaginatedTriggerListEmbeds(interaction.user, prismaKeywords);
 
-        const targetEmbed = keywordListEmbeds[selectedPageIndex];
-        if (selectedPageIndex < 0 || selectedPageIndex >= keywordListEmbeds.length) {
+        if (!Number.isInteger(selectedPageIndex) || selectedPageIndex < 0 || selectedPageIndex >= keywordListEmbeds.length) {
             const embed = embeds.error(interaction.user, '指定されたページの表示に失敗しました。');
             await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             return;
         }
+        const targetEmbed = keywordListEmbeds[selectedPageIndex];
 
         await interaction.update({ embeds: [targetEmbed] });
     }
