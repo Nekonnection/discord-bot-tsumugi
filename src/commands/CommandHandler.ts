@@ -74,21 +74,21 @@ export default class CommandHandler {
     public async onInteractionCreate(interaction: Interaction): Promise<void> {
         try {
             if (interaction.isChatInputCommand()) {
-                await this.handleChatInputCommand(interaction);
+                await this.chatInputCommand(interaction);
             } else if ('customId' in interaction && typeof interaction.customId === 'string') {
-                await this.handleActionInteraction(interaction);
+                await this.actionInteraction(interaction);
             } else if (interaction.isAutocomplete()) {
                 await this.handleAutocomplete(interaction);
             }
         } catch (error) {
-            await this.handleInteractionError(interaction, error);
+            await this.interactionError(interaction, error);
         }
     }
 
     /**
      * コマンドの処理
      */
-    private async handleChatInputCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    private async chatInputCommand(interaction: ChatInputCommandInteraction): Promise<void> {
         const subcommand = interaction.options.getSubcommand(false);
         const commandKey = subcommand ? `${interaction.commandName} ${subcommand}` : interaction.commandName;
         const command = this.commandMap.get(commandKey);
@@ -109,7 +109,7 @@ export default class CommandHandler {
     /**
      * アクションの処理
      */
-    private async handleActionInteraction(interaction: Interaction): Promise<void> {
+    private async actionInteraction(interaction: Interaction): Promise<void> {
         if (!('customId' in interaction) || typeof interaction.customId !== 'string') return;
 
         const params = new URLSearchParams(interaction.customId);
@@ -140,7 +140,7 @@ export default class CommandHandler {
     /**
      * インタラクション処理中のエラーハンドリング
      */
-    private async handleInteractionError(interaction: Interaction, error: unknown): Promise<void> {
+    private async interactionError(interaction: Interaction, error: unknown): Promise<void> {
         logger.error('インタラクションの処理中にエラーが発生しました:', error);
 
         if (!interaction.isRepliable()) return;
@@ -151,11 +151,14 @@ export default class CommandHandler {
             embeds: [errorEmbed],
             flags: [MessageFlags.Ephemeral]
         };
-
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp(replyOptions);
-        } else {
-            await interaction.reply(replyOptions);
+        try {
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp(replyOptions);
+            } else {
+                await interaction.reply(replyOptions);
+            }
+        } catch (error) {
+            logger.error('エラーメッセージの送信に失敗しました:', error);
         }
     }
 
