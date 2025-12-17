@@ -49,7 +49,7 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
         });
 
         const prismaKeywords = prismaKeywordsRaw.map((k) => {
-            let response;
+            let response: string | string[] = [];
 
             if (k.responses) {
                 response = [];
@@ -63,7 +63,7 @@ class KeywordListMenuAction extends MessageComponentActionInteraction<ComponentT
 
             return {
                 ...k,
-                responses: response as string | string[]
+                responses: response
             };
         });
 
